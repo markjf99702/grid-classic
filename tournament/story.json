@@ -1,0 +1,34 @@
+{
+  "headline": "The Professor Shows His <em>Work</em>",
+  "dek": "Sixteen bots, 1,017 games, every move chosen by code. Deep Cycle ruled the round robin at 113-2-5, but The Professor, seeded fourth, won the knockout and the Grid Classic.",
+  "story": [
+    "For 960 games, Deep Cycle looked untouchable. The alpha-beta searcher went 113-2-5 in the round robin and banked 341 points, 32 clear of The Architect in second. It went 30 for 30 at Crossroads. It also thought harder than anyone. Deep Cycle spent 7.6 milliseconds on each move, nearly four times as long as Gambler, the next-slowest bot in the field. Its tagline reads: 'I have already seen how this ends.' Through the whole round robin, nobody could prove it wrong.",
+    "Below the leader, the table broke into tiers. The Architect (309), The Guillotine (289) and The Professor (287) formed the chasing pack. Gambler sat alone in fifth on 229. The middle was a scrum of one-trick bots. Chicken lived up to the name with 14 draws and 14 head-on collisions. Scaredy Cat, built to run away, was in 14 head-on collisions too. At the foot of the table sat Random Randy: 0-3-117, with games lasting 46.5 ticks on average. All three of his points came from head-on crashes. He never won a game. He never seemed to mind.",
+    "The knockout punished reputations at once. Copycat, the 11th seed, had lost six of eight round-robin games to No. 6 Bloodhound. Copycat swept the series 3-0. Lefty Lucy, seeded 10th, had split eight games 4-4 with No. 7 Spacey. She swept too. Copycat had form for this. It handed Deep Cycle one of its five round-robin defeats, a 58-tick mugging at The Divide. Lucy kept swinging, taking a quarterfinal game off The Architect on Pillars after an 0-8 round-robin record against him. The Architect still won that tie 3-1. Copycat fell 3-0 to The Guillotine.",
+    "Then came the semifinal, and the upset of the tournament. The Professor had gone 1-0-7 against Deep Cycle in the round robin. His only win came at The Divide in 108 ticks. This time the series went the distance. Deep Cycle took Open Grid. The Professor answered on Pillars and The Divide. Deep Cycle squared it at Crossroads, the arena where it never lost a round-robin game. The decider went back to Open Grid, and The Professor won it in 237 ticks. Deep Cycle could see the ending. It could not change it.",
+    "The other semifinal was nearly as tense. The Guillotine had a 3-0-5 round-robin record against The Architect and trailed 2-1 after three games. It won at Crossroads, then took the decider on Open Grid in 565 ticks. The final opened with the strangest game of the event. On Open Grid, The Professor and The Guillotine carved up the board for 600 ticks, until all 1,200 cells were filled and both cycles crashed on the same tick. A draw. They had produced that exact result twice in the round robin.",
+    "The Professor struck first on Pillars. The Guillotine answered at The Divide in 119 ticks and at Crossroads in 261 to lead 2-1, one win from the title. The Professor won on Open Grid in 219 ticks to level it. The last game went back to Pillars, where The Professor had lost eight round-robin games, more than in any other arena. He won it in 306 ticks. Territory is a theorem, according to his tagline. The Professor showed his work."
+  ],
+  "champion": "The Professor, the No. 4 seed, is the Grid Classic champion. He beat Deep Cycle 3-2 in the semifinal, then came back from 2-1 down to beat The Guillotine 3-2 in the final.",
+  "ticker": [
+    "CHAMPION: The Professor, No. 4 seed, 12-5-1 in the knockout",
+    "DEEP CYCLE: 113-2-5 in the round robin, out 2-3 in the semis",
+    "RANDOM RANDY: 0 wins, 3 draws, 117 losses, no regrets",
+    "FULL BOARD: Professor v Guillotine filled all 1,200 cells three times",
+    "CHICKEN: 14 draws, 14 head-on collisions",
+    "SCAREDY CAT: built to flee, also in 14 head-on collisions",
+    "COPYCAT: beat Deep Cycle in 58 ticks at The Divide",
+    "DEEP CYCLE: 30-0-0 at Crossroads",
+    "SLOWEST THINKER: Deep Cycle, 7.6 ms per move",
+    "FASTEST THINKER: Random Randy, 0.004 ms per move. It showed",
+    "SHORTEST GAMES: 11 ticks, twice. Random Randy was in both",
+    "THE GUILLOTINE: both round-robin wins over Deep Cycle came on Pillars",
+    "HEAD-ONS: 57 in 1,017 games",
+    "SPACEY 8-0 v Scaredy Cat. Bloodhound and Gambler 8-0 v Wallflower"
+  ],
+  "footer": [
+    "All 16 bots were written in JavaScript by Claude and raced on a simultaneous-move engine: both cycles choose, then both move.",
+    "Every game was stored as its recorded moves and replayed for this page. Territory momentum is the Voronoi split: the open cells each cycle can reach first.",
+    "Four arenas, mirrored random starts: 960 round-robin games, then 57 more in a first-to-three knockout."
+  ]
+}

@@ -1,0 +1,430 @@
+[
+ {
+  "g": 1016,
+  "kicker": "The final \u00b7 G6",
+  "title": "The Professor takes the crown",
+  "blurb": "Two wins apiece after a drawn 600-tick opener, and the next win is the title. The Guillotine builds a magnificent fence on Pillars and ends up on the wrong side of it.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Final, game six, and it is all square! The Guillotine against The Professor on Pillars. Whoever wins this one lifts the trophy."
+   ],
+   [
+    60,
+    "vera",
+    "Early advantage to The Guillotine, holding just over half the board. Cutoff specialist, doing cutoff things."
+   ],
+   [
+    117,
+    "dash",
+    "Both riders hit the top edge with one open lane between them and both peel away from it! The whole middle of the arena is fenced off and nobody can get in!"
+   ],
+   [
+    135,
+    "vera",
+    "So The Guillotine spent the opening fencing off the middle of the board, then parked itself outside the fence. It gets the left-hand margin. The Professor gets the top and the entire right side."
+   ],
+   [
+    250,
+    "dash",
+    "The Guillotine is packing that left strip tight, but The Professor still has room to stretch out on the right."
+   ],
+   [
+    306,
+    "dash",
+    "It is over! The Guillotine runs out of road and The Professor, the number four seed, is your Grid Classic champion!"
+   ],
+   [
+    306,
+    "vera",
+    "Beat the top seed and the third seed back to back, both in deciding games. And look: the middle of that board is still completely empty."
+   ]
+  ]
+ },
+ {
+  "g": 1022,
+  "kicker": "Postscript \u00b7 G6",
+  "title": "The champion is dethroned",
+  "blurb": "The Challenger was written after the final to beat The Professor at his own game. Up 3-2, it needs one more win, on Pillars, where The Professor lost more round-robin games than on any other arena.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Postscript, game six! The Challenger leads 3-2 and The Professor is fighting for his reputation on Pillars."
+   ],
+   [
+    20,
+    "vera",
+    "Same search as The Professor, different scoring. The Challenger only counts space it can actually drive through, not pockets and dead ends."
+   ],
+   [
+    37,
+    "dash",
+    "The Challenger is already closest to two thirds of the board!"
+   ],
+   [
+    80,
+    "vera",
+    "That seal left The Professor 238 cells against 581. His territory looked fine on paper. The Challenger counted the holes in it."
+   ],
+   [
+    200,
+    "dash",
+    "The Professor is packing his little room as tight as he can, but the walls are closing in."
+   ],
+   [
+    311,
+    "dash",
+    "He's out of road! The Professor hits his own trail, and The Challenger takes the match 4-2!"
+   ],
+   [
+    311,
+    "vera",
+    "A reign of exactly one series. Territory is a theorem, and somebody just found a better proof."
+   ]
+  ]
+ },
+ {
+  "g": 1010,
+  "kicker": "Semifinal \u00b7 G5",
+  "title": "The giant falls",
+  "blurb": "Deep Cycle went 113-2-5 in the round robin. Two games each in the semifinal, and The Professor needs one more to end the run.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Semifinal, game five, two apiece! Deep Cycle, the number one seed, against The Professor on Open Grid."
+   ],
+   [
+    30,
+    "vera",
+    "The Professor comes in on a diagonal staircase, a turn every couple of squares. Deep Cycle has drawn itself a tall, narrow hairpin. Two very different ideas about geometry."
+   ],
+   [
+    80,
+    "dash",
+    "Deep Cycle is up to sixty-two percent of the board! The search engine is squeezing!"
+   ],
+   [
+    156,
+    "dash",
+    "The Professor sweeps along the bottom edge right underneath Deep Cycle and the door slams! The number one seed is locked into the small room!"
+   ],
+   [
+    175,
+    "vera",
+    "The Professor has turned about every third square this game. All that fussing was fence building: a lid along the top, a wall down the right, and now a floor."
+   ],
+   [
+    237,
+    "dash",
+    "Deep Cycle crashes into its own trail! The juggernaut is out, and The Professor is going to the final!"
+   ],
+   [
+    237,
+    "vera",
+    "Deep Cycle won 113 games by reading the future. Turns out the future had a wall in it."
+   ]
+  ]
+ },
+ {
+  "g": 1006,
+  "kicker": "Other semi \u00b7 G5",
+  "title": "Guillotine outlasts the Architect",
+  "blurb": "The other semifinal also went the distance. The Architect, the number two seed, against The Guillotine, with a place in the final on the line.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Game five, two apiece, and the winner meets The Professor! The Architect against The Guillotine on Open Grid."
+   ],
+   [
+    38,
+    "vera",
+    "Classic Architect: one dead straight wall from the middle of the board all the way to the top edge. It builds first and asks questions later."
+   ],
+   [
+    38,
+    "dash",
+    "And they are sealed apart already, at tick thirty-eight! The Guillotine gets the slightly bigger room!"
+   ],
+   [
+    300,
+    "vera",
+    "From here it is just two very tidy bots filling their rooms. The Architect plays it immaculately. It just has less room to be immaculate in."
+   ],
+   [
+    565,
+    "dash",
+    "The Architect runs out of room! The Guillotine is into the final!"
+   ],
+   [
+    565,
+    "vera",
+    "Five hundred and sixty-five ticks, decided, really, by a cut made at tick thirty-eight."
+   ]
+  ]
+ },
+ {
+  "g": 436,
+  "kicker": "Upset of the night",
+  "title": "Copycat stuns the top seed",
+  "blurb": "Deep Cycle lost just five of its 120 round-robin games. This was the fastest of them, at the hands of the 11th seed.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Round robin on The Divide: Copycat, the eleven seed, against the mighty Deep Cycle. This should be a formality."
+   ],
+   [
+    30,
+    "vera",
+    "Copycat is shadowing Deep Cycle move for move. Same shape, opposite corner. The sincerest form of flattery."
+   ],
+   [
+    45,
+    "dash",
+    "Deep Cycle wriggles up into the gap in the barrier, Copycat drops down right beside it, and the top seed is stuck in a one-lane slot!"
+   ],
+   [
+    50,
+    "vera",
+    "That slot runs between the barrier and Deep Cycle's own opening trail. All that search depth, and the only move left is down."
+   ],
+   [
+    58,
+    "dash",
+    "Straight off the bottom edge! Copycat beats the number one seed in fifty-eight ticks!"
+   ]
+  ]
+ },
+ {
+  "g": 962,
+  "kicker": "Round of 16 \u00b7 G1",
+  "title": "Twenty-four ticks of trouble",
+  "blurb": "Bloodhound, the 6th seed, against Copycat, the 11th. Copycat would sweep the series 3-0, and the opener was over almost before it started.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Round of 16! Bloodhound hunts, Copycat copies. What could possibly go wrong?"
+   ],
+   [
+    12,
+    "vera",
+    "Watch the two staircases. Bloodhound climbs toward the centre and Copycat comes down to meet it, step for step, turn for turn."
+   ],
+   [
+    23,
+    "dash",
+    "They are nose to tail in the middle of the board, and Bloodhound has nowhere left to go!"
+   ],
+   [
+    24,
+    "vera",
+    "Bloodhound chases the head and runs into the tail. Twenty-four ticks, and Copycat never needed an original thought."
+   ],
+   [
+    24,
+    "dash",
+    "Copycat goes one up, and it never got easier for Bloodhound: three straight, one of them in thirty-two ticks."
+   ]
+  ]
+ },
+ {
+  "g": 960,
+  "kicker": "Round of 16 \u00b7 G1",
+  "title": "Chicken flies into the alley",
+  "blurb": "Chicken the daredevil against Cinnamon Roll the spiral. Chicken held most of the arena with 23 ticks to go and still lost.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Chicken against Cinnamon Roll! Chicken lives on the edge, and tonight that is going to be very literal."
+   ],
+   [
+    30,
+    "vera",
+    "Cinnamon Roll heads straight for the outside wall. That is the first loop of its spiral, and the loop is the entire arena."
+   ],
+   [
+    140,
+    "dash",
+    "Chicken has ridden most of a lap just inside Cinnamon Roll's ring and it is holding most of the board! This is a big lead!"
+   ],
+   [
+    155,
+    "vera",
+    "And here is the daredevil bit. Chicken dives down the right side, doubles back up a one-lane alley, and Cinnamon Roll is driving up right alongside it."
+   ],
+   [
+    160,
+    "dash",
+    "Cinnamon Roll gets to the top first and turns across! The alley is a dead end!"
+   ],
+   [
+    163,
+    "vera",
+    "Chicken hits its own ring. That is the thing about playing chicken: sometimes the other driver just keeps going."
+   ]
+  ]
+ },
+ {
+  "g": 397,
+  "kicker": "Closest fill-off",
+  "title": "Equal halves, unequal housekeeping",
+  "blurb": "Spacey and Cinnamon Roll get sealed apart with exactly the same amount of room. Then it comes down to who wastes less of it.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Spacey against Cinnamon Roll on The Divide! Spacey grabs open space, Cinnamon Roll goes round and round."
+   ],
+   [
+    50,
+    "vera",
+    "Sealed apart, and it is a dead level split. From here it is a pure packing contest: whoever wastes fewer cells wins."
+   ],
+   [
+    120,
+    "dash",
+    "Hang on, look at the bottom right! Cinnamon Roll has drawn a line straight across its own half and shut a whole room behind it!"
+   ],
+   [
+    125,
+    "vera",
+    "The territory meter swings to Spacey the moment that door closes. A spiral is a lovely shape for a pastry and a terrible one for a sealed room."
+   ],
+   [
+    300,
+    "dash",
+    "Spacey keeps grinding through the left side, and it still has room to spare!"
+   ],
+   [
+    439,
+    "vera",
+    "Cinnamon Roll runs out of road with that back room still empty. Same size house, Spacey just used more of it."
+   ]
+  ]
+ },
+ {
+  "g": 909,
+  "kicker": "Swingiest game",
+  "title": "Wallflower's last dance",
+  "blurb": "Wallflower hugs walls, including other people's. Against Spacey the territory lead changed hands 27 times before the two of them coiled into a knot.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Round robin on The Divide: Wallflower against Spacey. Wallflower hugs walls. Any walls. Including yours."
+   ],
+   [
+    80,
+    "vera",
+    "Wallflower is sitting on eighty-five percent of the board. Do not get comfortable."
+   ],
+   [
+    180,
+    "dash",
+    "And now it is down to a third! This meter cannot make up its mind!"
+   ],
+   [
+    290,
+    "vera",
+    "Look at the bottom left. They have wound themselves into a coil: a ring of Wallflower, a ring of Spacey, a ring of Wallflower, each one hugging the last. It is a cinnamon roll, and Cinnamon Roll is not even playing."
+   ],
+   [
+    305,
+    "dash",
+    "Into the very centre of the coil now, and the room is running out for both of them!"
+   ],
+   [
+    316,
+    "dash",
+    "Wallflower hits its own trail! Spacey wins it with one square to spare!"
+   ],
+   [
+    316,
+    "vera",
+    "Three hundred ticks of slow dancing and it ends with Wallflower stepping on its own feet."
+   ]
+  ]
+ },
+ {
+  "g": 465,
+  "kicker": "Head-on",
+  "title": "The mirror blinks last",
+  "blurb": "Scaredy Cat runs from everything; Copycat does whatever its opponent does. Over 500 ticks they never get sealed apart.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Scaredy Cat against Copycat on Open Grid! One of them runs from everything, the other copies whatever the other one does. Somebody has to blink."
+   ],
+   [
+    200,
+    "vera",
+    "Turn for turn they are identical, and the territory meter has barely left fifty-fifty. It is like watching someone argue with a mirror."
+   ],
+   [
+    400,
+    "dash",
+    "Four hundred ticks and they are still not sealed apart! These two are still sharing the same room!"
+   ],
+   [
+    530,
+    "vera",
+    "The last lane they can both reach runs right down the middle of the board, and look who is at each end of it."
+   ],
+   [
+    542,
+    "dash",
+    "Head on! They meet dead in the middle! Five hundred and forty-two ticks and it ends nose to nose. It is a draw!"
+   ],
+   [
+    542,
+    "vera",
+    "The mirror finally showed Scaredy Cat its own face."
+   ]
+  ]
+ },
+ {
+  "g": 936,
+  "kicker": "Longest game",
+  "title": "Six hundred ticks of perfect balance",
+  "blurb": "The Guillotine and The Professor cut the board exactly in half at tick 40, then spent 560 ticks proving neither would make a mistake.",
+  "lines": [
+   [
+    0,
+    "dash",
+    "Round robin: The Guillotine against The Professor on Open Grid. Settle in. Seriously, settle in."
+   ],
+   [
+    30,
+    "vera",
+    "Matching staircases into the centre. Both of these bots know exactly what the other one is about to do."
+   ],
+   [
+    40,
+    "dash",
+    "The Guillotine runs to the left wall, The Professor runs to the right wall, and the board is cut clean in two!"
+   ],
+   [
+    45,
+    "vera",
+    "Note who went where. They have swapped sides: the Guillotine started bottom left and now lives upstairs, the Professor started top right and has moved downstairs."
+   ],
+   [
+    320,
+    "dash",
+    "Halfway through the fill and the territory meter has not moved a single point. Fifty-fifty, every single check."
+   ],
+   [
+    600,
+    "vera",
+    "Both pack their halves solid and run out of road on the very same tick. A perfect draw, joint longest game of the event, and they played out another 600-tick draw in game one of the final."
+   ]
+  ]
+ }
+]

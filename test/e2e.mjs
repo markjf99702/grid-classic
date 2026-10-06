@@ -1,0 +1,141 @@
+// Uses the page in Chromium the way a person would:  node test/e2e.mjs  (needs Playwright)
+import { createRequire } from 'node:module';
+import { execSync } from 'node:child_process';
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { join, dirname, extname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import assert from 'node:assert/strict';
+
+const require = createRequire(import.meta.url);
+let pw;
+try { pw = require('playwright'); } catch { pw = require(join(execSync('npm root -g').toString().trim(), 'playwright')); }
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.json': 'application/json' };
+const server = createServer(async (req, res) => {
+  const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+  let body;
+  try { body = await readFile(join(root, path === '/' ? 'index.html' : path)); } catch { res.writeHead(404); res.end(); return; }
+  res.writeHead(200, { 'content-type': TYPES[extname(path)] || 'text/html' });
+  res.end(body);
+}).listen(0);
+const base = `http://localhost:${server.address().port}/`;
+
+const browser = await pw.chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true });
+const page = await ctx.newPage();
+const problems = [];
+page.on('pageerror', e => problems.push(e.message));
+page.on('console', m => { if (m.type() === 'error') problems.push(m.text()); });
+page.on('requestfailed', r => problems.push('failed: ' + r.url()));
+page.on('request', r => { if (!r.url().startsWith(base)) problems.push('left the site: ' + r.url()); });
+
+await page.goto(base);
+await page.evaluate(() => document.fonts.ready);
+const count = sel => page.locator(sel).count();
+
+// The broadcast is all there: the reel, the bracket, the table, the matrix, the riders and the awards.
+assert.equal(await count('.clip'), 11, 'highlight reel');
+assert.equal(await count('.tie'), 15, 'bracket ties');
+assert.equal(await count('#table tbody tr'), 16, 'table rows');
+assert.equal(await count('.matrix td[data-a]'), 16 * 15, 'head-to-head cells');
+assert.equal(await count('.card'), 16, 'rider cards');
+assert.equal(await count('.award'), 8, 'awards');
+assert.equal(await page.locator('#challengeSection').isHidden(), false, 'the postscript challenge shows');
+assert.match(await page.textContent('#champ'), /The Professor/, 'champion banner');
+assert.equal(await page.evaluate(() => !!document.querySelector('#bracket svg.wires path.hot')?.getAttribute('d')), true, 'the champion\'s path is drawn through the bracket');
+
+// The first highlight plays; jumping to the end shows the verdict, its commentary and the next highlight.
+assert.match(await page.textContent('#clipTitle'), /\S/, 'a game is loaded');
+await page.evaluate(() => { const s = document.getElementById('scrub'); s.value = s.max; s.dispatchEvent(new Event('input')); });
+await page.waitForSelector('#verdict:not([hidden])');
+assert.match(await page.textContent('#verdictText'), /wins|Draw/);
+assert.ok(await count('#feed .line') >= 5, 'commentary lines in the booth');
+const before = await page.textContent('#clipTitle');
+await page.click('#nextBtn');
+assert.notEqual(await page.textContent('#clipTitle'), before, 'Next highlight loads another game');
+
+// Commentary can be written for any game: every highlight and every ninth game besides.
+const written = await page.evaluate(() => {
+  let n = 0;
+  for (let i = 0; i < 1023; i += 9) { if (!window.__lines(i).length) throw new Error('no lines for game ' + i); n++; }
+  for (const b of document.querySelectorAll('.clip')) { window.__lines(+b.dataset.g); n++; }
+  return n;
+});
+assert.ok(written > 100);
+
+// A knockout game shows its series; a chip loads that game of the series.
+await page.locator('.tie').last().click();
+await page.waitForSelector('#series:not([hidden]) .chip');
+await page.locator('#series .chip').first().click();
+assert.match(await page.textContent('#stageName'), /Final · G1/);
+
+// Every bot runs in the browser and answers with a legal move.
+const bots = await page.evaluate(() => {
+  const req = window.__botReq, E = req('', 'engine'), out = [];
+  for (const o of document.querySelectorAll('#exBot option')) {
+    const grid = E.makeGrid('Pillars'), [me, opp] = E.startFor('Pillars', 7), rng = E.mulberry32(7);
+    grid[me.y * E.W + me.x] = 1; grid[opp.y * E.W + opp.x] = 2;
+    const d = req('', window.__modId(o.value)).factory({ W: E.W, H: E.H, me: 0, rng }).move({ grid: grid.slice(), W: E.W, H: E.H, tick: 0, me, opp, meId: 1, oppId: 2, rng });
+    out.push([o.value, d]);
+  }
+  return out;
+});
+assert.equal(bots.length, 17);
+for (const [slug, d] of bots) assert.ok([0, 1, 2, 3].includes(d), `${slug} answered ${d}`);
+
+// Read the code: a rider card opens its bot's source.
+await page.locator('.card details summary').first().click();
+assert.match(await page.locator('.card details pre').first().textContent(), /module\.exports/);
+
+// The archive filters by bot and arena.
+await page.selectOption('#fBot', 'deep-cycle');
+await page.selectOption('#fMap', 'Crossroads');
+assert.match(await page.textContent('#fCount'), /^\d+ games?$/);
+assert.ok(await count('#results .gr') > 0, 'filtered games listed');
+
+// A dream match plays a brand-new game and puts it on the big screen.
+await page.selectOption('#dA', 'spacey');
+await page.selectOption('#dB', 'wallflower');
+await page.click('#dGo');
+await page.waitForFunction(() => /Dream match 1 is on the big screen/.test(document.getElementById('dStatus').textContent), null, { timeout: 30000 });
+assert.match(await page.textContent('#stageName'), /Dream match/);
+
+// Ride against a bot: go straight until something gives, and the result counts towards your record.
+await page.selectOption('#exBot', 'barry-straight');
+await page.selectOption('#exSpeed', '13');
+await page.click('#exGo');
+await page.waitForFunction(() => window.__exActive(), null, { timeout: 5000 });
+await page.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
+assert.match(await page.textContent('#exMsg'), /You win!|Barry Straight wins|Draw/);
+assert.match(await page.textContent('#exRec'), /^Your record against Barry Straight: \d won, \d drawn, \d lost$/);
+// The turn buttons (shown on touch screens) steer too.
+await page.click('#exGo');
+await page.waitForFunction(() => window.__exActive(), null, { timeout: 5000 });
+await page.locator('#exRight').dispatchEvent('click');
+await page.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
+const rec = await page.textContent('#exRec');
+// The record is still there after a reload.
+await page.reload();
+await page.evaluate(() => document.fonts.ready);
+await page.selectOption('#exBot', 'barry-straight');
+assert.equal(await page.textContent('#exRec'), rec, 'record kept after a reload');
+assert.match(rec, /: \d won, \d drawn, \d lost$/);
+const total = rec.match(/\d+/g).map(Number).reduce((a, b) => a + b, 0);
+assert.equal(total, 2, 'two rides counted');
+
+// Fits a phone: nothing scrolls sideways.
+assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'the page scrolls sideways on a phone');
+
+// Works offline once it has been opened.
+await page.waitForFunction(() => navigator.serviceWorker?.controller, null, { timeout: 10000 }).catch(() => {});
+await ctx.setOffline(true);
+await page.reload();
+assert.ok(await page.title(), 'the page did not load offline');
+assert.equal(await count('.clip'), 11, 'the reel is there offline');
+await ctx.setOffline(false);
+
+assert.deepEqual(problems.filter(p => !p.startsWith('failed:')), [], 'problems while using it');
+await browser.close();
+server.close();
+console.log('all good');

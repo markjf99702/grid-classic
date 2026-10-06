@@ -1,0 +1,11 @@
+{
+  "name": "grid-classic",
+  "private": true,
+  "type": "module",
+  "description": "Sixteen light-cycle bots, one tournament. Watch the replays, then ride against them.",
+  "scripts": {
+    "start": "npx --yes http-server -c-1 -p 8080 .",
+    "test": "node --test test/unit.test.mjs && node test/e2e.mjs",
+    "build": "node tournament/build.js && node tools/artifact.mjs"
+  }
+}
