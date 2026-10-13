@@ -115,13 +115,28 @@ await nextFrame();
 assert.equal(await slowmoShown(), false, 'no SLOW-MO badge on the verdict');
 
 // Commentary can be written for any game: every highlight and every ninth game besides.
-const written = await page.evaluate(() => {
-  let n = 0;
-  for (let i = 0; i < 1023; i += 9) { if (!window.__lines(i).length) throw new Error('no lines for game ' + i); n++; }
-  for (const b of document.querySelectorAll('.clip')) { window.__lines(+b.dataset.g); n++; }
-  return n;
+// Its count of open cells is right on every arena. Crossroads lists four wall cells twice, but it has 64, not 68:
+// game 23 there has 734 open cells at tick 200.
+const written = await page.evaluate(async () => {
+  const { DATA } = await import(new URL('js/data.js', location.href));
+  const E = window.__botReq('', 'engine'), ids = [23], wrong = [];
+  for (let i = 0; i < 1023; i += 9) ids.push(i);
+  for (const b of document.querySelectorAll('.clip')) ids.push(+b.dataset.g);
+  let milestones = 0;
+  for (const i of ids) {
+    const lines = window.__lines(i);
+    if (!lines.length) throw new Error('no lines for game ' + i);
+    const open = E.W * E.H - E.makeGrid(DATA.games[i].map).filter(v => v === 3).length;
+    for (const { text } of lines) {
+      const m = text.match(/^Tick (\d+) and still no wall between them\. (\d+) open cells/);
+      if (m) { milestones++; if (+m[2] !== open - 2 * (+m[1] + 1)) wrong.push(`game ${i}: ${text}`); }
+    }
+  }
+  return { n: ids.length, milestones, wrong };
 });
-assert.ok(written > 100);
+assert.ok(written.n > 100);
+assert.ok(written.milestones >= 10, 'the booth counts the open cells in long games');
+assert.deepEqual(written.wrong, [], 'open cells left on the grid');
 
 // Dream matches: the challenger has no seed or table place to talk about, and a bot against itself isn't compared with itself.
 const dreamTalk = await page.evaluate(async () => {

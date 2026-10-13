@@ -132,8 +132,8 @@ function commentary(g, sim) {
       lastClose = t;
     }
   });
-  // milestones in long games
-  const walls = mapCells(g.map).length;
+  // milestones in long games (Crossroads lists its four corner cells twice, so count each wall cell once)
+  const walls = new Set(mapCells(g.map).map(([x, y]) => y * W + x)).size;
   if (!scripted) for (const t of [200, 400, 600]) if ((!sim.sep || t < sim.sep.tick) && t < g.ticks - 10)
     say(t, 'vera', `Tick ${t} and still no wall between them. ${W * H - walls - 2 * (t + 1)} open cells left on the grid.`);
   if (sim.sep) {
