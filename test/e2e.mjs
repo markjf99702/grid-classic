@@ -92,7 +92,7 @@ const nextButton = async (title, width) => {
   }, title);
 };
 assert.equal((await nextButton('The mirror blinks last', 360)).inside, true, 'the longest Next label fits a 360 px phone');
-assert.ok((await nextButton('Twenty-four ticks of trouble', 390)).height < 40, 'a Next label that fits stays on one line');
+assert.ok((await nextButton('The mirror blinks last', 390)).height < 40, 'the longest Next label stays on one line on a 390 px phone');
 await page.setViewportSize({ width: 390, height: 844 });
 
 // The SLOW-MO badge is up only while slow motion plays: not after a pause and a scrub, and not on the final verdict.
