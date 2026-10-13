@@ -98,13 +98,15 @@ function commentary(g, sim) {
     `Here we go on ${g.map}! ${A} in one corner, ${B} in the other.`,
   ], k));
   const ra = (row[g.p[0]] || { rank: 17 }).rank, rb = (row[g.p[1]] || { rank: 17 }).rank;
+  // A dream match can bring in the challenger, who has no seed or table place, or set a bot against itself.
+  const seeded = !!(row[g.p[0]] && row[g.p[1]]), self = g.p[0] === g.p[1];
   if (g.stage === 'Challenge' && DATA.challenge) say(1, 'vera', `${nameOf(DATA.challenge.a)} was written after the final with one job: beat ${nameOf(DATA.challenge.b)}. First to four.`);
-  else if (!scripted) say(1, 'vera', Math.abs(ra - rb) >= 6
+  else if (!scripted) say(1, 'vera', seeded && Math.abs(ra - rb) >= 6
     ? `On paper this is a mismatch: the number ${Math.min(ra, rb)} seed against the number ${Math.max(ra, rb)}. On paper.`
-    : pickFrom([`Two very different philosophies here: ${bot[g.p[0]].style} against ${bot[g.p[1]].style}.`,
-      `${A} finished ${ra}${ord(ra)} in the table, ${B} ${rb}${ord(rb)}. Should be tight.`,
+    : pickFrom([!self && `Two very different philosophies here: ${bot[g.p[0]].style} against ${bot[g.p[1]].style}.`,
+      seeded && !self && `${A} finished ${ra}${ord(ra)} in the table, ${B} ${rb}${ord(rb)}. Should be tight.`,
       `Watch the middle of the grid early. Whoever owns it owns the game.`,
-      `${A}'s motto: "${bot[g.p[0]].tagline}" We'll see.`], k + 1));
+      `${A}'s motto: "${bot[g.p[0]].tagline}" We'll see.`].filter(Boolean), k + 1));
   // territory swings (hand-written highlight commentary covers these itself)
   let side = 0, lastSay = -99;
   if (!scripted) sim.mom.forEach((m, t) => {

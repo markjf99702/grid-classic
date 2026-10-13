@@ -82,6 +82,23 @@ const written = await page.evaluate(() => {
 });
 assert.ok(written > 100);
 
+// Dream matches: the challenger has no seed or table place to talk about, and a bot against itself isn't compared with itself.
+const dreamTalk = await page.evaluate(async () => {
+  const { DATA } = await import(new URL('js/data.js', location.href)); // the same module the page uses
+  const n = DATA.games.length, base = DATA.games.find(g => g.stage === 'Round robin'), out = [];
+  for (const p of [['the-challenger', 'deep-cycle'], ['random-randy', 'the-challenger'], ['the-professor', 'the-professor']])
+    for (let k = 0; k < 4; k++) {
+      DATA.games.push({ ...base, i: DATA.games.length, stage: 'Dream match', p, gameNo: k + 1 });
+      out.push([p.join(' v '), window.__lines(DATA.games.length - 1).find(l => l.tick === 1 && l.who === 'vera').text]);
+    }
+  DATA.games.length = n;
+  return out;
+});
+for (const [pair, line] of dreamTalk) {
+  assert.doesNotMatch(line, /seed|in the table/, `${pair}: ${line}`);
+  if (pair === 'the-professor v the-professor') assert.doesNotMatch(line, /different philosophies/, `${pair}: ${line}`);
+}
+
 // A knockout game shows its series; a chip loads that game of the series.
 await page.locator('.tie').last().click();
 await page.waitForSelector('#series:not([hidden]) .chip');
