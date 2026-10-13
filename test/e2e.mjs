@@ -128,6 +128,7 @@ await page.selectOption('#fBot', 'deep-cycle');
 await page.selectOption('#fMap', 'Crossroads');
 assert.match(await page.textContent('#fCount'), /^\d+ games?$/);
 assert.ok(await count('#results .gr') > 0, 'filtered games listed');
+assert.match(await page.locator('#results .gr').first().innerText(), /→ \S/, 'each game in the archive says who won, on a phone too');
 
 // A dream match plays a brand-new game and puts it on the big screen.
 await page.selectOption('#dA', 'spacey');
