@@ -261,6 +261,23 @@ assert.ok((await page.evaluate(() => localStorage.getItem('grid-classic.record')
 await page.selectOption('#exBot', 'chicken');
 assert.equal(await page.textContent('#exRec'), 'Your record against Chicken: 2 won, 0 drawn, 1 lost');
 
+// You ride the white cycle, and gold against Chicken, who rides white: the help says so and the board draws it so.
+assert.match(await page.textContent('.expanel .help'), /^You ride the white cycle \(gold against Chicken, who rides white\)\./);
+const yourTrail = async slug => {
+  await page.selectOption('#exBot', slug);
+  await page.click('#exGo');
+  await page.waitForFunction(() => window.__ride().state === 'live' && window.__ride().tick >= 3, null, { timeout: 15000 });
+  return page.evaluate(() => { // the cell after your start, copied out so the board's own canvas isn't read back
+    const board = document.getElementById('exArena'), c = board.width / 40, p = window.__ride().trails[0][1];
+    const px = Object.assign(document.createElement('canvas'), { width: 1, height: 1 }).getContext('2d', { willReadFrequently: true });
+    px.drawImage(board, Math.floor((p.x + .5) * c), Math.floor((p.y + .5) * c), 1, 1, 0, 0, 1, 1);
+    return [...px.getImageData(0, 0, 1, 1).data].slice(0, 3);
+  });
+};
+const [againstChicken, againstProfessor] = [await yourTrail('chicken'), await yourTrail('the-professor')];
+assert.ok(againstChicken[2] < 120 && againstChicken[1] < 200, `your trail is gold against Chicken: ${againstChicken}`);
+assert.ok(againstProfessor.every(v => v > 200), `your trail is white against The Professor: ${againstProfessor}`);
+
 // Fits a phone: nothing scrolls sideways.
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'the page scrolls sideways on a phone');
 
