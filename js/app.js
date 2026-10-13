@@ -182,7 +182,7 @@ function sizeCanvas() {
   cell = Math.max(4, Math.floor(w * dpr / W));
   cv.width = cell * W; cv.height = cell * H;
   mcv.width = Math.floor((mcv.clientWidth || 800) * dpr); mcv.height = 56 * dpr;
-  if (cur) { drawUpTo(tick); drawMom(); }
+  if (cur) { drawMom(); drawUpTo(tick); } // the chart first: drawUpTo puts the playhead and the dimmed future over it
 }
 function load(gi, opts = {}) {
   const g = games[gi], sim = simulate(g);

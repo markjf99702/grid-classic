@@ -55,6 +55,22 @@ const before = await page.textContent('#clipTitle');
 await page.click('#nextBtn');
 assert.notEqual(await page.textContent('#clipTitle'), before, 'Next highlight loads another game');
 
+// Paused part way through, the territory strip keeps its white playhead when the phone turns or the window resizes.
+await page.click('#play');
+const playhead = () => page.evaluate(() => {
+  const s = document.getElementById('scrub'), mom = document.getElementById('mom');
+  const x = Math.floor(+s.value / +s.max * mom.width);
+  return [...mom.getContext('2d').getImageData(x, mom.height >> 1, 1, 1).data].join();
+});
+await page.evaluate(() => { const s = document.getElementById('scrub'); s.value = Math.round(s.max / 2); s.dispatchEvent(new Event('input')); });
+const nextFrame = () => page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+assert.equal(await playhead(), '255,255,255,255', 'the playhead is on the strip');
+await page.setViewportSize({ width: 390, height: 760 });
+await nextFrame();
+assert.equal(await playhead(), '255,255,255,255', 'the playhead is still there after a resize');
+await page.setViewportSize({ width: 390, height: 844 });
+await nextFrame();
+
 // Commentary can be written for any game: every highlight and every ninth game besides.
 const written = await page.evaluate(() => {
   let n = 0;
