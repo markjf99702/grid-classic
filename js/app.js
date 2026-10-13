@@ -376,10 +376,12 @@ mcv.onclick = e => { const r = mcv.getBoundingClientRect(); tick = Math.round((e
 document.querySelectorAll('[data-speed]').forEach(b => b.onclick = () => {
   speed = +b.dataset.speed; document.querySelectorAll('[data-speed]').forEach(x => x.classList.toggle('on', x === b));
 });
+// A focused button, link or summary keeps Space for itself, so the page's Space shortcuts only act from the page.
+const onControl = e => !!(e.target.closest && e.target.closest('button, a, summary, [role=button]'));
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
   if (window.__exActive && window.__exActive()) return;
-  if (e.code === 'Space') { e.preventDefault(); $('play').click(); }
+  if (e.code === 'Space' && !e.defaultPrevented && !onControl(e)) { e.preventDefault(); $('play').click(); }
   if (e.code === 'ArrowRight') { tick = Math.min(cur.sim.heads.length - 1, tick + 10); drawUpTo(tick); }
   if (e.code === 'ArrowLeft') { tick = Math.max(0, tick - 10); drawUpTo(tick); }
 });
@@ -696,7 +698,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
     if (!ex) return;
     if (e.code in keyDir && (ex.state === 'live' || ex.state === 'countdown')) { e.preventDefault(); steer(keyDir[e.code]); }
-    else if (e.code === 'Space' && ex.state === 'over') { e.preventDefault(); start(); }
+    else if (e.code === 'Space' && ex.state === 'over' && !onControl(e)) { e.preventDefault(); start(); }
   });
   let touch = null;
   $('exBoard').addEventListener('touchstart', e => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; }, { passive: true });

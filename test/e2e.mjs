@@ -135,6 +135,44 @@ assert.ok(await page.title(), 'the page did not load offline');
 assert.equal(await count('.clip'), 11, 'the reel is there offline');
 await ctx.setOffline(false);
 
+// On a desktop, Space presses whichever button has focus; it works the replay and the rides only from the page itself.
+{
+  const desk = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, serviceWorkers: 'block' })).newPage();
+  desk.on('pageerror', e => problems.push(e.message));
+  await desk.goto(base);
+  await desk.evaluate(() => document.fonts.ready);
+  const press = async (sel, key = 'Space') => { await desk.focus(sel); await desk.keyboard.press(key); };
+  const riding = () => desk.evaluate(() => window.__exActive());
+  await press('.clip:nth-child(3)');
+  assert.equal(await desk.textContent('#clipTitle'), await desk.textContent('.clip:nth-child(3) .ttl'), 'Space on a highlight loads it');
+  assert.equal(await desk.textContent('#play'), 'Pause', 'and plays it');
+  await press('[data-speed="0.5"]');
+  assert.equal(await desk.getAttribute('[data-speed="0.5"]', 'class'), 'btn on', 'Space on a speed button picks that speed');
+  await press('.card details summary');
+  assert.equal(await desk.locator('.card details').first().evaluate(d => d.open), true, 'Space on Read the code opens it');
+  await desk.click('#play');
+  assert.equal(await desk.textContent('#play'), 'Play');
+  const t0 = +await desk.textContent('#tick');
+  await desk.keyboard.press('ArrowRight');
+  assert.equal(+await desk.textContent('#tick'), t0 + 10, 'the arrows still skip ahead after clicking Pause');
+  await press('#results .gr');
+  assert.equal(await desk.textContent('#play'), 'Pause', 'Space on an archive game plays it, like Enter');
+  await desk.evaluate(() => document.activeElement.blur());
+  await desk.keyboard.press('Space');
+  assert.equal(await desk.textContent('#play'), 'Play', 'Space from the page pauses the replay');
+  await desk.selectOption('#exSpeed', '13');
+  await press('#exGo');
+  assert.equal(await riding(), true, 'Space on Start starts a ride');
+  await desk.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
+  await press('.clip:nth-child(4)');
+  assert.equal(await desk.textContent('#clipTitle'), await desk.textContent('.clip:nth-child(4) .ttl'), 'after a ride, Space on a highlight loads it');
+  assert.equal(await riding(), false, 'and leaves the finished ride alone');
+  await desk.evaluate(() => document.activeElement.blur());
+  await desk.keyboard.press('Space');
+  assert.equal(await riding(), true, 'Space from the page starts the next ride');
+  await desk.context().close();
+}
+
 assert.deepEqual(problems.filter(p => !p.startsWith('failed:')), [], 'problems while using it');
 await browser.close();
 server.close();
