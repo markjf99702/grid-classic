@@ -461,10 +461,10 @@ $('awardsSection').hidden = !(DATA.awards || []).length;
 const maps = DATA.maps;
 $('tableNote').textContent = `Every bot played every other bot eight times: all four arenas, from both starting corners. Three points for a win, one for a draw. ${games.filter(g => g.stage === 'Round robin').length} games in all. Map bars show win rate per arena (${maps.join(', ')}).`;
 $('table').innerHTML = `<thead><tr><th>#</th><th class="l">Bot</th><th>P</th><th>W</th><th>D</th><th>L</th><th>Pts</th><th>Head-ons</th><th>Avg length</th><th class="l">By arena</th><th>ms/move</th></tr></thead><tbody>` +
-  DATA.standings.map(t => `<tr${t.rank === 8 ? ' class="cut"' : ''}><td>${t.rank}</td><td class="l bot">${dot(t.slug)}${esc(nameOf(t.slug))}<span class="tg">${esc(bot[t.slug].tagline)}</span></td><td>${t.P}</td><td>${t.W}</td><td>${t.D}</td><td>${t.L}</td><td class="pts">${t.pts}</td><td>${t.headOn}</td><td>${t.avgTicks}</td><td class="l"><span class="maps">${maps.map(m => {
+  DATA.standings.map(t => `<tr${t.rank === 8 ? ' class="cut"' : ''}><td>${t.rank}</td><td class="l bot">${dot(t.slug)}${esc(nameOf(t.slug))}<span class="tg">${esc(bot[t.slug].tagline)}</span></td><td>${t.P}</td><td>${t.W}</td><td>${t.D}</td><td>${t.L}</td><td class="pts">${t.pts}</td><td>${t.headOn}</td><td>${t.avgTicks.toFixed(1)}</td><td class="l"><span class="maps">${maps.map(m => {
     const r = t.byMap[m] || { W: 0, D: 0, L: 0 }, n = r.W + r.D + r.L || 1;
     return `<i title="${esc(m)}: ${r.W}-${r.D}-${r.L}"><b style="width:${(r.W / n * 100).toFixed(0)}%"></b></i>`;
-  }).join('')}</span></td><td>${t.msPerMove}</td></tr>`).join('') + '</tbody>';
+  }).join('')}</span></td><td>${t.msPerMove.toFixed(3)}</td></tr>`).join('') + '</tbody>';
 
 // matrix
 const order = DATA.standings.map(t => t.slug);
@@ -496,7 +496,7 @@ $('roster').innerHTML = DATA.standings.map(t => {
     <div class="top"><span class="nm" style="color:${b.color}">${esc(b.name)}</span><span class="rk">#${t.rank} · ${t.pts} pts</span></div>
     <span class="style" style="color:${b.color}">${esc(b.style)}</span>
     <p class="tag">“${esc(b.tagline)}”</p><p class="bio">${esc(b.bio)}</p>
-    <div class="stats"><span><b>${t.W}-${t.D}-${t.L}</b> W-D-L</span><span><b>${t.avgTicks}</b> avg ticks</span><span><b>${esc(fate)}</b></span></div>
+    <div class="stats"><span><b>${t.W}-${t.D}-${t.L}</b> W-D-L</span><span><b>${t.avgTicks.toFixed(1)}</b> avg ticks</span><span><b>${esc(fate)}</b></span></div>
     <div class="cardacts"><button class="btn" data-ride="${t.slug}">Ride against</button><details data-src="${t.slug}"><summary class="btn">Read the code</summary><pre class="src"></pre></details></div></article>`;
 }).join('');
 $('roster').querySelectorAll('[data-ride]').forEach(b => b.onclick = () => {
@@ -526,7 +526,7 @@ function filterGames() {
   // The same bot as bot and opponent means its games against itself (only dream matches have those).
   const bots = g => a && a === b ? g.p[0] === a && g.p[1] === a : (!a || g.p.includes(a)) && (!b || g.p.includes(b));
   const list = games.filter(g => bots(g) && (!m || g.map === m) && (!s || g.stage === s));
-  $('fCount').textContent = `${list.length} game${list.length === 1 ? '' : 's'}${list.length > 300 ? ', showing the longest 300' : ''}`;
+  $('fCount').textContent = `${list.length.toLocaleString('en')} game${list.length === 1 ? '' : 's'}${list.length > 300 ? ', showing the longest 300' : ''}`;
   $('results').innerHTML = list.sort((x, y) => y.ticks - x.ticks).slice(0, 300).map(g =>
     `<div class="gr" data-g="${g.i}" role="button" tabindex="0"><span class="st">${esc(g.stage)}${g.gameNo ? ' G' + g.gameNo : ''}</span><span>${vsLine(g)} <span class="st">→ ${g.winner ? esc(nameOf(g.winner)) : 'draw'}</span></span><span class="mp">${esc(g.map)}</span><span class="num">${g.ticks}t</span></div>`).join('');
 }

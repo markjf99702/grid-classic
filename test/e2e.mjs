@@ -46,6 +46,13 @@ assert.equal(await count('.award'), 8, 'awards');
 assert.equal(await page.locator('#challengeSection').isHidden(), false, 'the postscript challenge shows');
 assert.match(await page.textContent('#champ'), /The Professor/, 'champion banner');
 assert.equal(await page.evaluate(() => !!document.querySelector('#bracket svg.wires path.hot')?.getAttribute('d')), true, 'the champion\'s path is drawn through the bracket');
+// Numbers read the same way throughout: 1,023 like the rest of the page, and each table column to the same places.
+assert.equal(await page.textContent('#fCount'), '1,023 games, showing the longest 300');
+for (const [avg, ms] of await page.$$eval('#table tbody tr', rows => rows.map(r => [r.cells[8].textContent, r.cells[10].textContent]))) {
+  assert.match(avg, /^\d+\.\d$/, 'average length');
+  assert.match(ms, /^\d+\.\d{3}$/, 'ms per move');
+}
+assert.ok((await page.$$eval('.card .stats span:nth-child(2) b', bs => bs.map(b => b.textContent))).every(t => /^\d+\.\d$/.test(t)), 'average ticks on the rider cards');
 
 // The first highlight plays; jumping to the end shows the verdict, its commentary and the next highlight.
 assert.match(await page.textContent('#clipTitle'), /\S/, 'a game is loaded');
