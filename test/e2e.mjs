@@ -137,6 +137,12 @@ await page.click('#dGo');
 await page.waitForFunction(() => /Dream match 1 is on the big screen/.test(document.getElementById('dStatus').textContent), null, { timeout: 30000 });
 assert.match(await page.textContent('#stageName'), /Dream match/);
 
+// A saved record mangled by hand can't stop the rides, and the other bots' records stay exactly as they were.
+const chickenRecord = '"chicken":{"W":2,"D":0,"L":1}';
+await page.evaluate(r => localStorage.setItem('grid-classic.record', `{"barry-straight":"abc",${r}}`), chickenRecord);
+await page.reload();
+await page.evaluate(() => document.fonts.ready);
+
 // Ride against a bot: go straight until something gives, and the result counts towards your record.
 // Swipes on the board steer only during a ride; the rest of the time it scrolls the page like everything else.
 const touchAction = () => page.$eval('#exBoard', b => getComputedStyle(b).touchAction);
@@ -164,6 +170,9 @@ assert.equal(await page.textContent('#exRec'), rec, 'record kept after a reload'
 assert.match(rec, /: \d won, \d drawn, \d lost$/);
 const total = rec.match(/\d+/g).map(Number).reduce((a, b) => a + b, 0);
 assert.equal(total, 2, 'two rides counted');
+assert.ok((await page.evaluate(() => localStorage.getItem('grid-classic.record'))).includes(chickenRecord), 'another bot\'s record is untouched');
+await page.selectOption('#exBot', 'chicken');
+assert.equal(await page.textContent('#exRec'), 'Your record against Chicken: 2 won, 0 drawn, 1 lost');
 
 // Fits a phone: nothing scrolls sideways.
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'the page scrolls sideways on a phone');

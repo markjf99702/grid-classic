@@ -566,13 +566,16 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
   let record = {};
   try { record = JSON.parse(localStorage.getItem(RECORD)) || {}; } catch (e) { /* storage refused or unreadable */ }
   if (typeof record !== 'object' || Array.isArray(record)) record = {};
+  // Each bot's entry is { W, D, L }. Anything else, which only editing storage by hand can leave, counts as no games yet.
+  const entry = slug => { const r = record[slug]; return r && typeof r === 'object' && !Array.isArray(r) ? r : null; };
+  const num = v => Number(v) || 0;
   function showRecord() {
-    const slug = $('exBot').value, r = record[slug];
-    $('exRec').textContent = r ? `Your record against ${nameOf(slug)}: ${r.W || 0} won, ${r.D || 0} drawn, ${r.L || 0} lost` : '';
+    const slug = $('exBot').value, r = entry(slug);
+    $('exRec').textContent = r ? `Your record against ${nameOf(slug)}: ${num(r.W)} won, ${num(r.D)} drawn, ${num(r.L)} lost` : '';
   }
   function tally(slug, k) {
-    const r = record[slug] || (record[slug] = { W: 0, D: 0, L: 0 });
-    r[k] = (r[k] || 0) + 1;
+    const r = entry(slug) || (record[slug] = { W: 0, D: 0, L: 0 });
+    r[k] = num(r[k]) + 1;
     try { localStorage.setItem(RECORD, JSON.stringify(record)); } catch (e) { /* storage refused: keep it for this visit */ }
     showRecord();
   }
@@ -683,6 +686,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     }
   }
   function loop(now) {
+    requestAnimationFrame(loop); // first, so one bad frame can't stop the board for good
     const dt = Math.min(100, now - (last2 || now)); last2 = now;
     if (ex && ex.state === 'countdown') {
       const left = 3 - Math.floor((now - ex.t0) / 600);
@@ -695,7 +699,6 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
       while (acc2 >= 1 && ex.state === 'live') { acc2 -= 1; step(); moved = true; }
       if (moved) draw2();
     }
-    requestAnimationFrame(loop);
   }
   const keyDir = { ArrowUp: 0, KeyW: 0, ArrowRight: 1, KeyD: 1, ArrowDown: 2, KeyS: 2, ArrowLeft: 3, KeyA: 3 };
   document.addEventListener('keydown', e => {
