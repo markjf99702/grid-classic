@@ -54,7 +54,7 @@ node tournament/challenge.js                           # the postscript match, w
 node tournament/build.js                               # writes js/data.js and js/bots.js for the page
 ```
 
-A new run can change the results. The bots take their randomness from each game's seed, so most games come out the same move for move, but Deep Cycle stops searching when its time runs out, so its games depend on the machine, and a different result there can carry through the table into the bracket. The written commentary in `story.json` and `highlights.json` would then need rewriting to match. Changing a bot's colour or bio only needs `node tournament/build.js`.
+A new run can change the results. The bots take their randomness from each game's seed, so most games come out the same move for move, but Deep Cycle stops searching when its time runs out, so its games depend on the machine, and a different result there can carry through the table into the bracket. A new run also numbers the knockout games in bracket order (round, tie, then game), where the stored one numbered them in the order they finished, so the knockout games in `highlights.json` (960, 962, 1006 and 1010) would get new numbers. The written commentary in `story.json` and `highlights.json` would then need rewriting to match. Changing a bot's colour or bio only needs `node tournament/build.js`.
 
 ### Files
 

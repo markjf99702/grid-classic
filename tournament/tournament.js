@@ -20,6 +20,17 @@ if (!isMainThread) {
   return;
 }
 
+// The ties of a round are played side by side, so their games finish in whatever order the workers get to them.
+// Once the bracket is done, number the knockout games in bracket order (round, then tie, then game), the way the
+// round robin is numbered by seed, so every run gives each game the same number. highlights.json finds games by number.
+function numberKnockout(games, bracket) {
+  const order = bracket.flatMap(r => r.ties.flatMap(t => t.games)), first = games.length - order.length;
+  const number = new Map(order.map((gi, k) => [gi, first + k]));
+  order.map(gi => games[gi]).forEach((g, k) => { g.i = first + k; games[first + k] = g; });
+  for (const r of bracket) for (const t of r.ties) t.games = t.games.map(gi => number.get(gi));
+}
+if (require.main !== module) { module.exports = { numberKnockout }; return; } // required by the tests: no tournament
+
 const { MAPS } = require('./engine');
 const MAP_NAMES = Object.keys(MAPS);
 const only = process.argv[2] ? process.argv[2].split(',') : null;
@@ -102,6 +113,7 @@ function record(stage, p0, p1, map, seed, r, extra = {}) {
     bracket.push({ round: rname, ties: done });
     field = done.map(t => t.winner);
   }
+  numberKnockout(games, bracket);
   async function playTie(rname, a, b) {
     const tie = { a, b, score: [0, 0], games: [] };
     const base = (tieSeed += 1000);

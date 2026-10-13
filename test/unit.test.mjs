@@ -69,6 +69,32 @@ test('the bracket and the challenge follow from their games', () => {
   assert.equal(DATA.challenge.b, DATA.champion);
 });
 
+test('a new run numbers the knockout games in bracket order, whichever order they finish in', () => {
+  const { numberKnockout } = require('../tournament/tournament.js');
+  const ko = DATA.bracket.flatMap(r => r.ties.flatMap(t => t.games)), first = DATA.games.length - DATA.challenge.games.length - ko.length;
+  const run = () => ({ games: structuredClone(DATA.games.slice(0, first + ko.length)), bracket: structuredClone(DATA.bracket) });
+  // The stored run numbered them as they finished: Deep Cycle v Random Randy, the first tie, is games 965, 984 and 985.
+  const stored = run();
+  assert.deepEqual(stored.bracket[0].ties[0].games, [965, 984, 985]);
+  numberKnockout(stored.games, stored.bracket);
+  let n = first;
+  for (const r of stored.bracket) for (const t of r.ties) t.games.forEach((gi, k) => {
+    const g = stored.games[gi];
+    assert.equal(gi, n++, `${r.round}, ${t.a} v ${t.b}, game ${k + 1}`);
+    assert.ok(g.i === gi && g.gameNo === k + 1 && g.stage === r.round && g.p.includes(t.a) && g.p.includes(t.b), `game ${gi}`);
+  });
+  assert.equal(n, first + ko.length);
+  assert.deepEqual(stored.games.slice(0, first), DATA.games.slice(0, first), 'the round robin keeps its numbers');
+  const same = gs => gs.map(g => g.stage + g.p + g.moves).sort();
+  assert.deepEqual(same(stored.games), same(DATA.games.slice(0, first + ko.length)), 'every game is still there once');
+  // Finishing the other way round gives every game the same number.
+  const other = run(), moved = new Map();
+  other.games.slice(first).reverse().forEach((g, k) => { moved.set(g.i, first + k); g.i = first + k; other.games[first + k] = g; });
+  for (const r of other.bracket) for (const t of r.ties) t.games = t.games.map(gi => moved.get(gi));
+  numberKnockout(other.games, other.bracket);
+  assert.deepEqual(other, stored);
+});
+
 test('records in the written copy read win-draw-loss, like the table and the rider cards', () => {
   const wdl = r => `${r.W}-${r.D}-${r.L}`, row = Object.fromEntries(DATA.standings.map(r => [r.slug, r]));
   const ko = { W: 0, D: 0, L: 0 };
