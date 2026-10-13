@@ -164,6 +164,19 @@ await page.selectOption('#dB', 'wallflower');
 await page.click('#dGo');
 await page.waitForFunction(() => /Dream match 1 is on the big screen/.test(document.getElementById('dStatus').textContent), null, { timeout: 30000 });
 assert.match(await page.textContent('#stageName'), /Dream match/);
+// A bot against itself: the territory strip tells the two sides apart, as the scorebug does.
+await page.evaluate(() => {
+  const fill = CanvasRenderingContext2D.prototype.fillText;
+  window.__stripLabels = [];
+  CanvasRenderingContext2D.prototype.fillText = function (text, ...rest) { if (this.canvas.id === 'mom') window.__stripLabels.push(text); return fill.call(this, text, ...rest); };
+});
+await page.selectOption('#dA', 'barry-straight');
+await page.selectOption('#dB', 'barry-straight');
+await page.click('#dGo');
+await page.waitForFunction(() => /Dream match 2 is on the big screen/.test(document.getElementById('dStatus').textContent), null, { timeout: 30000 });
+assert.equal(await page.textContent('#nm1'), 'Barry Straight II');
+const stripLabels = await page.evaluate(() => window.__stripLabels.slice(-2));
+assert.deepEqual(stripLabels, ['TERRITORY · BARRY STRAIGHT II', 'BARRY STRAIGHT I'], 'the territory strip names both sides');
 
 // A saved record mangled by hand can't stop the rides, and the other bots' records stay exactly as they were.
 const chickenRecord = '"chicken":{"W":2,"D":0,"L":1}';

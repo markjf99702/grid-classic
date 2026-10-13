@@ -335,8 +335,8 @@ function drawMom() {
   const fs = Math.round(h * .19);
   mctx.font = `700 ${fs}px Barlow, sans-serif`; mctx.fillStyle = 'rgba(255,255,255,.8)';
   mctx.textAlign = 'right';
-  mctx.fillText(`TERRITORY · ${nameOf(g.p[1]).toUpperCase()}`, w - fs * .6, fs * 1.2);
-  mctx.fillText(nameOf(g.p[0]).toUpperCase(), w - fs * .6, h - fs * .5);
+  mctx.fillText(`TERRITORY · ${sideName(g, 1).toUpperCase()}`, w - fs * .6, fs * 1.2);
+  mctx.fillText(sideName(g, 0).toUpperCase(), w - fs * .6, h - fs * .5);
   mctx.textAlign = 'left';
   cur.momImg = mctx.getImageData(0, 0, w, h);
 }
