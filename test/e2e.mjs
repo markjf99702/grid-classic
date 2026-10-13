@@ -73,6 +73,20 @@ assert.equal(await playhead(), '255,255,255,255', 'the playhead is still there a
 await page.setViewportSize({ width: 390, height: 844 });
 await nextFrame();
 
+// At the end of a highlight, the Next button stays inside the board on a small phone, on one line when it fits.
+const nextButton = async (title, width) => {
+  await page.setViewportSize({ width, height: 780 });
+  return page.evaluate(t => {
+    [...document.querySelectorAll('.clip')].find(c => c.querySelector('.ttl').textContent === t).click();
+    const s = document.getElementById('scrub'); s.value = s.max; s.dispatchEvent(new Event('input'));
+    const b = document.getElementById('nextBtn').getBoundingClientRect(), board = document.querySelector('.canvaswrap').getBoundingClientRect();
+    return { inside: b.left >= board.left && b.right <= board.right, height: b.height };
+  }, title);
+};
+assert.equal((await nextButton('The mirror blinks last', 360)).inside, true, 'the longest Next label fits a 360 px phone');
+assert.ok((await nextButton('Twenty-four ticks of trouble', 390)).height < 40, 'a Next label that fits stays on one line');
+await page.setViewportSize({ width: 390, height: 844 });
+
 // Commentary can be written for any game: every highlight and every ninth game besides.
 const written = await page.evaluate(() => {
   let n = 0;

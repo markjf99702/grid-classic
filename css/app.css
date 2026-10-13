@@ -75,9 +75,9 @@ button, select { font: inherit; color: inherit; }
 .canvaswrap { position: relative; background: #050813; }
 canvas#arena { display: block; width: 100%; height: auto; max-width: 100%; }
 .slowmo { position: absolute; left: 10px; top: 10px; background: var(--live); color: #fff; font: 700 11px/1 var(--body); letter-spacing: .16em; text-transform: uppercase; padding: 5px 8px 4px; border-radius: 2px; }
-.verdict { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 10px; }
+.verdict { position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); display: grid; justify-items: center; gap: 10px; }
 .verdict .vt { background: var(--chyron); color: var(--ink); font: 900 clamp(22px, 4vw, 40px)/1 var(--display); text-transform: uppercase; padding: 10px 18px 8px; letter-spacing: .03em; white-space: nowrap; box-shadow: 0 10px 40px #0009; }
-.verdict .next { background: var(--ink); color: var(--fg); border: 1px solid var(--chyron); border-radius: 3px; padding: 7px 14px; font: 600 13px var(--body); cursor: pointer; white-space: nowrap; }
+.verdict .next { background: var(--ink); color: var(--fg); border: 1px solid var(--chyron); border-radius: 3px; padding: 7px 14px; font: 600 13px var(--body); cursor: pointer; text-align: center; max-width: 100%; } /* one line unless the board is too narrow for it */
 .verdict .next:hover { background: var(--panel-2); }
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--ink); }
 .btn { background: var(--panel-2); border: 1px solid var(--line); border-radius: 3px; padding: 6px 12px; cursor: pointer; font-weight: 600; font-size: 13px; }
