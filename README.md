@@ -54,7 +54,7 @@ node tournament/challenge.js                           # the postscript match, w
 node tournament/build.js                               # writes js/data.js and js/bots.js for the page
 ```
 
-A new run changes the results (Gambler plays with randomness and Deep Cycle thinks against the clock), so the written commentary in `story.json` and `highlights.json` would need rewriting to match. Changing a bot's colour or bio only needs `node tournament/build.js`.
+A new run can change the results. The bots take their randomness from each game's seed, so most games come out the same move for move, but Deep Cycle stops searching when its time runs out, so its games depend on the machine, and a different result there can carry through the table into the bracket. The written commentary in `story.json` and `highlights.json` would then need rewriting to match. Changing a bot's colour or bio only needs `node tournament/build.js`.
 
 ### Files
 
