@@ -137,6 +137,14 @@ const written = await page.evaluate(async () => {
 assert.ok(written.n > 100);
 assert.ok(written.milestones >= 10, 'the booth counts the open cells in long games');
 assert.deepEqual(written.wrong, [], 'open cells left on the grid');
+// A hand-written highlight speaks for itself: one opening line, its own verdict on the seal, and in "Twenty-four
+// ticks of trouble" the booth says Bloodhound has nowhere left to go once, not twice.
+const reelTalk = await page.evaluate(() => [...document.querySelectorAll('.clip')].map(b => ({ title: b.querySelector('.ttl').textContent, lines: window.__lines(+b.dataset.g) })));
+for (const { title, lines } of reelTalk) {
+  assert.equal(lines.filter(l => l.tick === 0).length, 1, `${title}: one opening line`);
+  assert.ok(!lines.some(l => /Barring a meltdown|cells in it\. |pure fill-off now/.test(l.text)), `${title}: no generated verdict on the seal`);
+}
+assert.equal(reelTalk.find(r => r.title === 'Twenty-four ticks of trouble').lines.filter(l => /nowhere left to go/.test(l.text)).length, 1);
 
 // Dream matches: the challenger has no seed or table place to talk about, and a bot against itself isn't compared with itself.
 const dreamTalk = await page.evaluate(async () => {

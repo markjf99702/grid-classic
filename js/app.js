@@ -88,10 +88,12 @@ function commentary(g, sim) {
   const [A, B] = [0, 1].map(i => sideName(g, i)), out = [];
   const say = (tick, who, text, big) => out.push({ tick, who, text, big });
   const k = g.i, h = hl[g.i], scripted = !!(h && h.lines && h.lines.length);
+  // The ticks a hand-written highlight has its own lines for: the generated call for the same moment would repeat it.
+  const written = new Set(scripted ? h.lines.map(l => +l[0]) : []);
   // Cycle through phrase lists in order (from a per-game offset) so lines don't repeat back to back.
   const seq = {};
   const next = (key, list) => { seq[key] = seq[key] === undefined ? hash(key + k) % list.length : (seq[key] + 1) % list.length; return list[seq[key]]; };
-  say(0, 'dash', pickFrom([
+  if (!written.has(0)) say(0, 'dash', pickFrom([
     `${A} and ${B} roll out on ${g.map}. Lights are green!`,
     `We are under way on ${g.map}: ${A} against ${B}.`,
     `${g.map} is the venue. ${A}, ${B}, engines hot, and they're off.`,
@@ -138,11 +140,12 @@ function commentary(g, sim) {
     say(t, 'vera', `Tick ${t} and still no wall between them. ${W * H - walls - 2 * (t + 1)} open cells left on the grid.`);
   if (sim.sep) {
     const [a, b] = sim.sep.cells, lead = a > b ? A : B, diff = Math.abs(a - b);
-    if (Math.min(a, b) <= 3) say(sim.sep.tick, 'dash', `BOXED IN! ${a <= 3 ? A : B} has ${Math.min(a, b) === 0 ? 'nowhere left to go' : `${Math.min(a, b)} cells left and no way out`}!`, true);
+    if (Math.min(a, b) <= 3) { if (!written.has(sim.sep.tick)) say(sim.sep.tick, 'dash', `BOXED IN! ${a <= 3 ? A : B} has ${Math.min(a, b) === 0 ? 'nowhere left to go' : `${Math.min(a, b)} cells left and no way out`}!`, true); }
     else {
     say(sim.sep.tick, 'dash', next('seal', [`SEALED OFF! ${A} has ${a} cells, ${B} has ${b}.`,
       `The door slams shut! ${A}: ${a} cells. ${B}: ${b}.`]), true);
-    say(sim.sep.tick + 1, 'vera', diff === 0 ? `Dead level. This is a pure fill-off now, and every wasted cell counts.`
+    // The verdict on the two rooms; a hand-written highlight gives its own.
+    if (!scripted) say(sim.sep.tick + 1, 'vera', diff === 0 ? `Dead level. This is a pure fill-off now, and every wasted cell counts.`
       : diff < 15 ? `Only ${diff} cells in it. ${lead} has the bigger room, but they still have to fill it without a mistake.`
       : `${lead} has ${diff} more cells to live in. Barring a meltdown, this is decided.`);
     }
