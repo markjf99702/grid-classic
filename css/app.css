@@ -84,7 +84,7 @@ canvas#arena { display: block; width: 100%; height: auto; max-width: 100%; }
 .btn:hover { border-color: var(--mute); }
 .btn.on { background: var(--chyron); color: var(--ink); border-color: var(--chyron); }
 input[type=range] { flex: 1; min-width: 120px; accent-color: var(--chyron); }
-.momentum { display: block; width: 100%; height: 56px; background: var(--ink); border-top: 1px solid var(--line); cursor: pointer; }
+.momentum { display: block; width: 100%; min-width: 0; height: 56px; background: var(--ink); border-top: 1px solid var(--line); cursor: pointer; } /* min-width: 0 lets it shrink to the board even before the script sizes it */
 .booth { border-left: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr; min-height: 0; max-height: 640px; }
 @media (max-width: 920px) { .booth { border-left: 0; border-top: 1px solid var(--line); max-height: 340px; } }
 .booth header { padding: 12px 14px; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
@@ -244,4 +244,4 @@ pre.src { flex-basis: 100%; max-width: 100%; min-width: 0; margin: 4px 0 0; max-
 .jd-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; margin-top: 30px; padding-bottom: env(safe-area-inset-bottom, 0px); font: 400 13px/1.4 var(--body); color: var(--mute); }
 .jd-foot a { color: inherit; text-decoration: none; border-radius: 2px; }
 .jd-foot a:hover, .jd-foot a:focus-visible { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
-.noscript { max-width: 60ch; margin: 40px auto; padding: 0 20px; font-size: 16px; }
+.noscript { max-width: 60ch; margin: 22px 0 0; font-size: 16px; }

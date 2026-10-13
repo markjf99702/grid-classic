@@ -297,6 +297,16 @@ offline = false;
   await desk.context().close();
 }
 
+// With JavaScript off, a phone shows what the page needs it for on the first screen, and the page still fits.
+{
+  const nojs = await (await browser.newContext({ viewport: { width: 390, height: 844 }, javaScriptEnabled: false, serviceWorkers: 'block' })).newPage();
+  await nojs.goto(base);
+  const note = await nojs.locator('.noscript').boundingBox();
+  assert.ok(note && note.y + note.height < 844, 'the note about JavaScript is on the first screen');
+  assert.equal(await nojs.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'the page scrolls sideways without JavaScript');
+  await nojs.context().close();
+}
+
 assert.deepEqual(problems.filter(p => !p.startsWith('failed:')), [], 'problems while using it');
 await browser.close();
 server.close();
