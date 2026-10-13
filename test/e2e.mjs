@@ -129,6 +129,12 @@ await page.selectOption('#fMap', 'Crossroads');
 assert.match(await page.textContent('#fCount'), /^\d+ games?$/);
 assert.ok(await count('#results .gr') > 0, 'filtered games listed');
 assert.match(await page.locator('#results .gr').first().innerText(), /→ \S/, 'each game in the archive says who won, on a phone too');
+// The same bot as bot and opponent finds its games against itself, and the tournament has none.
+await page.selectOption('#fMap', '');
+await page.selectOption('#fBot', 'chicken');
+await page.selectOption('#fBot2', 'chicken');
+assert.equal(await page.textContent('#fCount'), '0 games', 'Chicken against Chicken');
+await page.selectOption('#fBot2', '');
 
 // A dream match plays a brand-new game and puts it on the big screen.
 await page.selectOption('#dA', 'spacey');

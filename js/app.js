@@ -523,7 +523,9 @@ const stages = [...new Set(games.map(g => g.stage))];
 $('fStage').innerHTML = opt('', 'Any stage') + stages.map(s => opt(s, s)).join('');
 function filterGames() {
   const a = $('fBot').value, b = $('fBot2').value, m = $('fMap').value, s = $('fStage').value;
-  const list = games.filter(g => (!a || g.p.includes(a)) && (!b || g.p.includes(b)) && (!m || g.map === m) && (!s || g.stage === s));
+  // The same bot as bot and opponent means its games against itself (only dream matches have those).
+  const bots = g => a && a === b ? g.p[0] === a && g.p[1] === a : (!a || g.p.includes(a)) && (!b || g.p.includes(b));
+  const list = games.filter(g => bots(g) && (!m || g.map === m) && (!s || g.stage === s));
   $('fCount').textContent = `${list.length} game${list.length === 1 ? '' : 's'}${list.length > 300 ? ', showing the longest 300' : ''}`;
   $('results').innerHTML = list.sort((x, y) => y.ticks - x.ticks).slice(0, 300).map(g =>
     `<div class="gr" data-g="${g.i}" role="button" tabindex="0"><span class="st">${esc(g.stage)}${g.gameNo ? ' G' + g.gameNo : ''}</span><span>${vsLine(g)} <span class="st">→ ${g.winner ? esc(nameOf(g.winner)) : 'draw'}</span></span><span class="mp">${esc(g.map)}</span><span class="num">${g.ticks}t</span></div>`).join('');
