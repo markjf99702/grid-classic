@@ -604,6 +604,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     ex = { slug, map, grid, pos, ai, rng, tick: 0, queue: [], state: 'countdown', t0: performance.now(), trails: [[{ ...pos[0] }], [{ ...pos[1] }]], dead: [false, false], rate: +$('exSpeed').value };
     if (typeof playing !== 'undefined') { playing = false; $('play').textContent = 'Play'; }
     $('exGo').textContent = 'Restart';
+    $('exBoard').classList.add('riding');
     draw2();
   }
   function steer(d) {
@@ -633,6 +634,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     ex.pos = nx; ex.tick++; ex.dead = dead;
     if (dead[0] || dead[1]) {
       ex.state = 'over';
+      $('exBoard').classList.remove('riding');
       const name = nameOf(ex.slug);
       let title, sub;
       if (dead[0] && dead[1]) { tally(ex.slug, 'D'); title = 'Draw'; sub = `You and ${name} went down together after ${ex.tick} ticks.`; }

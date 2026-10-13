@@ -143,7 +143,8 @@ input[type=range] { flex: 1; min-width: 120px; accent-color: var(--chyron); }
 /* exhibition */
 .exwrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; border: 1px solid var(--line); background: var(--panel); }
 @media (max-width: 920px) { .exwrap { grid-template-columns: minmax(0, 1fr); } }
-.exboard { position: relative; background: #050813; min-width: 0; touch-action: none; }
+.exboard { position: relative; background: #050813; min-width: 0; }
+.exboard.riding { touch-action: none; } /* swipes steer during a ride; otherwise the board scrolls the page like the rest */
 canvas#exArena { display: block; width: 100%; height: auto; max-width: 100%; }
 .exover { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
 .exover .msg { background: var(--chyron); color: var(--ink); font: 900 clamp(24px, 5vw, 48px)/1 var(--display); text-transform: uppercase; padding: 10px 20px 8px; box-shadow: 0 10px 40px #0009; text-align: center; }

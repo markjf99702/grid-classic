@@ -102,11 +102,16 @@ await page.waitForFunction(() => /Dream match 1 is on the big screen/.test(docum
 assert.match(await page.textContent('#stageName'), /Dream match/);
 
 // Ride against a bot: go straight until something gives, and the result counts towards your record.
+// Swipes on the board steer only during a ride; the rest of the time it scrolls the page like everything else.
+const touchAction = () => page.$eval('#exBoard', b => getComputedStyle(b).touchAction);
+assert.equal(await touchAction(), 'auto', 'the board scrolls the page before a ride');
 await page.selectOption('#exBot', 'barry-straight');
 await page.selectOption('#exSpeed', '13');
 await page.click('#exGo');
 await page.waitForFunction(() => window.__exActive(), null, { timeout: 5000 });
+assert.equal(await touchAction(), 'none', 'swipes on the board steer during a ride');
 await page.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
+assert.equal(await touchAction(), 'auto', 'the board scrolls the page again once the ride is over');
 assert.match(await page.textContent('#exMsg'), /You win!|Barry Straight wins|Draw/);
 assert.match(await page.textContent('#exRec'), /^Your record against Barry Straight: \d won, \d drawn, \d lost$/);
 // The turn buttons (shown on touch screens) steer too.
