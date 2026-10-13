@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npx --yes http-server -c-1 -p 8080 .",
     "test": "node --test test/unit.test.mjs && node test/e2e.mjs",
-    "build": "node tournament/build.js && node tools/artifact.mjs"
+    "build": "node tournament/build.js && node tools/artifact.mjs",
+    "sim": "node tournament/replay.js"
   }
 }
