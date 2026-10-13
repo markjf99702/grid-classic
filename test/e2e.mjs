@@ -157,6 +157,11 @@ await page.selectOption('#fBot', 'chicken');
 await page.selectOption('#fBot2', 'chicken');
 assert.equal(await page.textContent('#fCount'), '0 games', 'Chicken against Chicken');
 await page.selectOption('#fBot2', '');
+// A search with no games says so.
+await page.selectOption('#fBot', 'random-randy');
+await page.selectOption('#fStage', 'Final');
+assert.equal(await page.textContent('#results'), 'No games match those filters.');
+await page.selectOption('#fStage', '');
 
 // A dream match plays a brand-new game and puts it on the big screen.
 await page.selectOption('#dA', 'spacey');

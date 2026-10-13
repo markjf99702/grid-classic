@@ -528,7 +528,8 @@ function filterGames() {
   const list = games.filter(g => bots(g) && (!m || g.map === m) && (!s || g.stage === s));
   $('fCount').textContent = `${list.length.toLocaleString('en')} game${list.length === 1 ? '' : 's'}${list.length > 300 ? ', showing the longest 300' : ''}`;
   $('results').innerHTML = list.sort((x, y) => y.ticks - x.ticks).slice(0, 300).map(g =>
-    `<div class="gr" data-g="${g.i}" role="button" tabindex="0"><span class="st">${esc(g.stage)}${g.gameNo ? ' G' + g.gameNo : ''}</span><span>${vsLine(g)} <span class="st">→ ${g.winner ? esc(nameOf(g.winner)) : 'draw'}</span></span><span class="mp">${esc(g.map)}</span><span class="num">${g.ticks}t</span></div>`).join('');
+    `<div class="gr" data-g="${g.i}" role="button" tabindex="0"><span class="st">${esc(g.stage)}${g.gameNo ? ' G' + g.gameNo : ''}</span><span>${vsLine(g)} <span class="st">→ ${g.winner ? esc(nameOf(g.winner)) : 'draw'}</span></span><span class="mp">${esc(g.map)}</span><span class="num">${g.ticks}t</span></div>`).join('')
+    || '<p class="none">No games match those filters.</p>';
 }
 ['fBot', 'fBot2', 'fMap', 'fStage'].forEach(id => $(id).onchange = filterGames);
 $('results').addEventListener('click', e => { const r = e.target.closest('.gr'); if (r) load(+r.dataset.g, { scroll: true }); });
