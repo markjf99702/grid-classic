@@ -385,7 +385,8 @@ const onControl = e => !!(e.target.closest && e.target.closest('button, a, summa
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
   if (window.__exActive && window.__exActive()) return;
-  if (e.code === 'Space' && !e.defaultPrevented && !onControl(e)) { e.preventDefault(); $('play').click(); }
+  // With the ride board on screen and no ride running, Space from the page is the board's: it starts a ride.
+  if (e.code === 'Space' && !e.defaultPrevented && !onControl(e) && !(window.__exReady && window.__exReady())) { e.preventDefault(); $('play').click(); }
   if (e.code === 'ArrowRight') { tick = Math.min(cur.sim.heads.length - 1, tick + 10); drawUpTo(tick); }
   if (e.code === 'ArrowLeft') { tick = Math.max(0, tick - 10); drawUpTo(tick); }
 });
@@ -590,6 +591,12 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
   $('exMap').innerHTML = DATA.maps.map(m => `<option>${esc(m)}</option>`).join('');
   window.__exActive = () => ex && (ex.state === 'live' || ex.state === 'countdown');
   window.__ride = () => ex; // for tools/screenshots.mjs, which steers a ride to photograph
+  // No ride running, and at least half the board in the window: Space from the page starts a ride rather than working the replay.
+  window.__exReady = () => {
+    if (window.__exActive()) return false;
+    const r = $('exBoard').getBoundingClientRect();
+    return Math.min(r.bottom, innerHeight) - Math.max(r.top, 0) >= r.height / 2;
+  };
 
   function size2() {
     const w = cv2.clientWidth || 800, dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -709,10 +716,12 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
   const keyDir = { ArrowUp: 0, KeyW: 0, ArrowRight: 1, KeyD: 1, ArrowDown: 2, KeyS: 2, ArrowLeft: 3, KeyA: 3 };
   document.addEventListener('keydown', e => {
     if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
-    if (!ex) return;
-    if (e.code in keyDir && (ex.state === 'live' || ex.state === 'countdown')) { e.preventDefault(); steer(keyDir[e.code]); }
-    // Space from the page starts the next ride once this one is over, and mid-ride it doesn't scroll the board away.
-    else if (e.code === 'Space' && !onControl(e)) { e.preventDefault(); if (ex.state === 'over') start(); }
+    // Space from the page starts a ride when none is running and the board is on screen (the first ride too),
+    // and mid-ride it doesn't scroll the board away. With the board off screen it stays with the replay.
+    if (e.code === 'Space' && !onControl(e)) {
+      if (window.__exActive()) e.preventDefault();
+      else if (window.__exReady()) { e.preventDefault(); start(); }
+    } else if (e.code in keyDir && window.__exActive()) { e.preventDefault(); steer(keyDir[e.code]); }
   });
   let touch = null;
   $('exBoard').addEventListener('touchstart', e => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; }, { passive: true });
