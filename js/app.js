@@ -571,15 +571,15 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
   // Each bot's entry is { W, D, L }. Anything else, which only editing storage by hand can leave, counts as no games yet.
   const entry = slug => { const r = record[slug]; return r && typeof r === 'object' && !Array.isArray(r) ? r : null; };
   const num = v => Number(v) || 0;
-  function showRecord() {
-    const slug = $('exBot').value, r = entry(slug);
+  function showRecord(slug = $('exBot').value) {
+    const r = entry(slug);
     $('exRec').textContent = r ? `Your record against ${nameOf(slug)}: ${num(r.W)} won, ${num(r.D)} drawn, ${num(r.L)} lost` : '';
   }
   function tally(slug, k) {
     const r = entry(slug) || (record[slug] = { W: 0, D: 0, L: 0 });
     r[k] = num(r[k]) + 1;
     try { localStorage.setItem(RECORD, JSON.stringify(record)); } catch (e) { /* storage refused: keep it for this visit */ }
-    showRecord();
+    showRecord(slug); // the bot you just rode against, even if the menu changed mid-ride
   }
   $('exBot').innerHTML = DATA.standings.map(t => `<option value="${t.slug}">${esc(nameOf(t.slug))} (#${t.rank})</option>`).join('')
     + (DATA.challenge ? `<option value="${DATA.challenge.a}">${esc(nameOf(DATA.challenge.a))} (challenger)</option>` : '');
@@ -610,6 +610,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     try { ai = req('', modId(slug)).factory({ W, H, me: 1, rng }); } catch (e) { $('exMsg').innerHTML = 'That bot failed to load'; return; }
     ex = { slug, map, grid, pos, ai, rng, tick: 0, queue: [], state: 'countdown', t0: performance.now(), trails: [[{ ...pos[0] }], [{ ...pos[1] }]], dead: [false, false], rate: +$('exSpeed').value };
     if (typeof playing !== 'undefined') { playing = false; $('play').textContent = 'Play'; }
+    showRecord(slug);
     $('exGo').textContent = 'Restart';
     $('exBoard').classList.add('riding');
     draw2();
@@ -721,9 +722,17 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
   $('exLeft').onclick = () => turn(-1);
   $('exRight').onclick = () => turn(1);
   $('exGo').onclick = start;
-  $('exBot').addEventListener('change', showRecord);
+  // A new arena or opponent between rides clears the last result away, back to how the board starts.
+  const ready = $('exMsg').innerHTML;
+  function clearBoard() {
+    if (ex && ex.state !== 'over') return; // mid-ride, the ride carries on
+    ex = null; draw2();
+    $('exMsg').innerHTML = ready; $('exMsg').hidden = false;
+    $('exGo').textContent = 'Start';
+  }
+  $('exBot').addEventListener('change', () => { clearBoard(); showRecord(); });
   showRecord();
-  $('exMap').onchange = () => { if (!ex || ex.state === 'over') { ex = null; draw2(); } };
+  $('exMap').onchange = clearBoard;
   window.addEventListener('resize', size2);
   size2();
   requestAnimationFrame(loop);

@@ -162,12 +162,18 @@ await page.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 })
 assert.equal(await touchAction(), 'auto', 'the board scrolls the page again once the ride is over');
 assert.match(await page.textContent('#exMsg'), /You win!|Barry Straight wins|Draw/);
 assert.match(await page.textContent('#exRec'), /^Your record against Barry Straight: \d won, \d drawn, \d lost$/);
+// A new arena between rides clears the last result away.
+await page.selectOption('#exMap', 'Pillars');
+assert.match(await page.textContent('#exMsg'), /^Ready when you are/, 'a new arena clears the last result');
+assert.equal(await page.textContent('#exGo'), 'Start');
 // The turn buttons (shown on touch screens) steer too.
 await page.click('#exGo');
 await page.waitForFunction(() => window.__exActive(), null, { timeout: 5000 });
 await page.locator('#exRight').dispatchEvent('click');
 await page.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
 const rec = await page.textContent('#exRec');
+await page.selectOption('#exBot', 'random-randy');
+assert.match(await page.textContent('#exMsg'), /^Ready when you are/, 'so does a new opponent');
 // The record is still there after a reload.
 await page.reload();
 await page.evaluate(() => document.fonts.ready);
@@ -242,6 +248,11 @@ offline = false;
   assert.equal(await desk.evaluate(() => window.__ride() === window.__thisRide && window.__exActive()), true, 'and the ride carries on');
   await press('#exGo');
   assert.equal(await desk.evaluate(() => window.__ride() !== window.__thisRide && window.__ride().state), 'countdown', 'Space on Restart restarts the ride');
+  // A new opponent picked mid-ride waits for the next ride; the record shown at the end is for the bot you rode against.
+  await desk.selectOption('#exBot', 'chicken');
+  assert.equal(await riding(), true, 'the ride carries on');
+  await desk.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
+  assert.match(await desk.textContent('#exRec'), /^Your record against The Professor: /);
   await desk.context().close();
 }
 
