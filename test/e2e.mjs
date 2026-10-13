@@ -29,6 +29,7 @@ const page = await ctx.newPage();
 const problems = [];
 page.on('pageerror', e => problems.push(e.message));
 page.on('console', m => { if (m.type() === 'error') problems.push(m.text()); });
+page.on('console', m => { if (m.type() === 'warning' && m.text().startsWith('Canvas2D')) problems.push(m.text()); }); // the canvases are drawn the efficient way
 page.on('requestfailed', r => problems.push('failed: ' + r.url()));
 page.on('request', r => { if (!r.url().startsWith(base)) problems.push('left the site: ' + r.url()); });
 

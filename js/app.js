@@ -177,7 +177,7 @@ function ord(n) { return ['th', 'st', 'nd', 'rd'][(n % 100 > 10 && n % 100 < 14)
 
 // ---------- player
 const cv = $('arena'), ctx = cv.getContext('2d');
-const mcv = $('mom'), mctx = mcv.getContext('2d');
+const mcv = $('mom'), mctx = mcv.getContext('2d', { willReadFrequently: true }); // the strip reads its chart back to draw the playhead over it
 let cur = null, tick = 0, playing = true, speed = 1, acc = 0, lastT = 0, cell = 20;
 function sizeCanvas() {
   const w = cv.clientWidth || 800, dpr = Math.min(2, window.devicePixelRatio || 1);
