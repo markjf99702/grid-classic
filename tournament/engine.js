@@ -31,7 +31,9 @@ const MAPS = {
 // meetings between deterministic bots aren't carbon copies.
 const START = [{ x: 9, y: 14, dir: 1 }, { x: W - 1 - 9, y: H - 1 - 14, dir: 3 }];
 
-// Starts are always 180° rotations of each other, so every game is fair.
+// Starts are always 180° rotations of each other, and so are Open Grid, The Divide and Crossroads, so there both riders
+// face the same arena. Pillars isn't quite (its four outer pillars sit a cell off a half turn), so the two riders can
+// start at different distances from a pillar, though in the round robin each corner won 109 games there.
 function startFor(mapName, seed) {
   const grid = makeGrid(mapName);
   const rng = mulberry32(Math.imul(seed + 0x5bd1e995, 2654435761) >>> 0); rng(); rng();
