@@ -95,6 +95,25 @@ assert.equal((await nextButton('The mirror blinks last', 360)).inside, true, 'th
 assert.ok((await nextButton('Twenty-four ticks of trouble', 390)).height < 40, 'a Next label that fits stays on one line');
 await page.setViewportSize({ width: 390, height: 844 });
 
+// The SLOW-MO badge is up only while slow motion plays: not after a pause and a scrub, and not on the final verdict.
+const slowmoShown = () => page.evaluate(() => !document.getElementById('slowmo').hidden);
+assert.equal(await page.evaluate(() => new Promise(done => {
+  [...document.querySelectorAll('.clip')].find(c => c.querySelector('.ttl').textContent === 'Twenty-four ticks of trouble').click();
+  const t0 = performance.now();
+  (function pauseInSlowMo() { // pause on the first frame the badge shows
+    if (!document.getElementById('slowmo').hidden) { document.getElementById('play').click(); done(true); }
+    else if (performance.now() - t0 > 30000) done(false);
+    else requestAnimationFrame(pauseInSlowMo);
+  })();
+})), true, 'the SLOW-MO badge shows while slow motion plays');
+await page.evaluate(() => { const s = document.getElementById('scrub'); s.value = 3; s.dispatchEvent(new Event('input')); });
+await nextFrame();
+assert.equal(await slowmoShown(), false, 'no SLOW-MO badge once paused and scrubbed back');
+await page.click('#play');
+await page.waitForSelector('#verdict:not([hidden])', { timeout: 30000 });
+await nextFrame();
+assert.equal(await slowmoShown(), false, 'no SLOW-MO badge on the verdict');
+
 // Commentary can be written for any game: every highlight and every ninth game besides.
 const written = await page.evaluate(() => {
   let n = 0;

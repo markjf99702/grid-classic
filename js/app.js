@@ -357,13 +357,15 @@ function frame(now) {
   if (cur && playing) {
     // Broadcast slow-mo around the sealing moment and the final crash.
     const sm = slowMo(tick);
-    $('slowmo').hidden = !sm;
     acc += dt * speed * (sm ? .3 : 1) * 22 / 1000;
     let moved = false;
     while (acc >= 1) { acc -= 1; if (tick < cur.sim.heads.length - 1) { tick++; moved = true; } }
     if (moved) drawUpTo(tick);
     if (tick >= cur.sim.heads.length - 1) { playing = false; $('play').textContent = 'Replay'; }
   }
+  // The SLOW-MO badge is up only while slow motion is playing: not on the final verdict, on a pause or after a scrub.
+  const badge = !!(cur && playing && slowMo(tick));
+  if ($('slowmo').hidden === badge) $('slowmo').hidden = !badge;
   requestAnimationFrame(frame);
 }
 $('series').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) load(+c.dataset.g, { from: cur.from }); });
