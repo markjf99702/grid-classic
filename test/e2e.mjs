@@ -119,8 +119,9 @@ const bots = await page.evaluate(() => {
 assert.equal(bots.length, 17);
 for (const [slug, d] of bots) assert.ok([0, 1, 2, 3].includes(d), `${slug} answered ${d}`);
 
-// Read the code: a rider card opens its bot's source.
+// Read the code: a rider card opens its bot's source (filled in when the card's toggle event arrives, just after the click).
 await page.locator('.card details summary').first().click();
+await page.waitForFunction(() => document.querySelector('.card details pre').textContent);
 assert.match(await page.locator('.card details pre').first().textContent(), /module\.exports/);
 
 // The archive filters by bot and arena.
