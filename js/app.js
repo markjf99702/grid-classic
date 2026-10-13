@@ -702,7 +702,8 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
     if (!ex) return;
     if (e.code in keyDir && (ex.state === 'live' || ex.state === 'countdown')) { e.preventDefault(); steer(keyDir[e.code]); }
-    else if (e.code === 'Space' && ex.state === 'over' && !onControl(e)) { e.preventDefault(); start(); }
+    // Space from the page starts the next ride once this one is over, and mid-ride it doesn't scroll the board away.
+    else if (e.code === 'Space' && !onControl(e)) { e.preventDefault(); if (ex.state === 'over') start(); }
   });
   let touch = null;
   $('exBoard').addEventListener('touchstart', e => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; }, { passive: true });

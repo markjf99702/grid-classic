@@ -183,7 +183,8 @@ offline = false;
 
 // On a desktop, Space presses whichever button has focus; it works the replay and the rides only from the page itself.
 {
-  const desk = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, serviceWorkers: 'block' })).newPage();
+  // Reduced motion makes the page's jumps to the big screen instant, so a smooth scroll can't race the checks below.
+  const desk = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce', serviceWorkers: 'block' })).newPage();
   desk.on('pageerror', e => problems.push(e.message));
   await desk.goto(base);
   await desk.evaluate(() => document.fonts.ready);
@@ -213,9 +214,19 @@ offline = false;
   await press('.clip:nth-child(4)');
   assert.equal(await desk.textContent('#clipTitle'), await desk.textContent('.clip:nth-child(4) .ttl'), 'after a ride, Space on a highlight loads it');
   assert.equal(await riding(), false, 'and leaves the finished ride alone');
+  await desk.selectOption('#exSpeed', '6');
   await desk.evaluate(() => document.activeElement.blur());
   await desk.keyboard.press('Space');
   assert.equal(await riding(), true, 'Space from the page starts the next ride');
+  // Mid-ride, Space from the page leaves the board where it is; on the focused Restart button it still restarts.
+  await desk.evaluate(() => { window.scrollTo(0, document.getElementById('exhibition').getBoundingClientRect().top + scrollY - 44); window.__thisRide = window.__ride(); });
+  const y = await desk.evaluate(() => scrollY);
+  await desk.keyboard.press('Space');
+  await desk.waitForTimeout(300);
+  assert.equal(await desk.evaluate(() => scrollY), y, 'Space mid-ride doesn\'t scroll the board away');
+  assert.equal(await desk.evaluate(() => window.__ride() === window.__thisRide && window.__exActive()), true, 'and the ride carries on');
+  await press('#exGo');
+  assert.equal(await desk.evaluate(() => window.__ride() !== window.__thisRide && window.__ride().state), 'countdown', 'Space on Restart restarts the ride');
   await desk.context().close();
 }
 
