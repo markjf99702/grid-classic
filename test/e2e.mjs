@@ -12,7 +12,9 @@ let pw;
 try { pw = require('playwright'); } catch { pw = require(join(execSync('npm root -g').toString().trim(), 'playwright')); }
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.json': 'application/json' };
+let offline = false; // when set, the server hangs up on every request, like a phone with no signal
 const server = createServer(async (req, res) => {
+  if (offline) { req.socket.destroy(); return; }
   const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   let body;
   try { body = await readFile(join(root, path === '/' ? 'index.html' : path)); } catch { res.writeHead(404); res.end(); return; }
@@ -148,13 +150,18 @@ assert.equal(total, 2, 'two rides counted');
 // Fits a phone: nothing scrolls sideways.
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'the page scrolls sideways on a phone');
 
-// Works offline once it has been opened.
-await page.waitForFunction(() => navigator.serviceWorker?.controller, null, { timeout: 10000 }).catch(() => {});
+// Works offline once it has been opened. Playwright's offline switch doesn't reach the service worker's own
+// requests, so the server stops answering too: the page, its code and its fonts all have to come from the worker's copy.
+await page.waitForFunction(() => navigator.serviceWorker?.controller, null, { timeout: 15000 });
+offline = true;
 await ctx.setOffline(true);
 await page.reload();
+await page.evaluate(() => document.fonts.ready);
 assert.ok(await page.title(), 'the page did not load offline');
 assert.equal(await count('.clip'), 11, 'the reel is there offline');
+assert.equal(await page.evaluate(() => [...document.fonts].some(f => f.family.includes('Big Shoulders') && f.status === 'loaded')), true, 'the fonts are there offline');
 await ctx.setOffline(false);
+offline = false;
 
 // On a desktop, Space presses whichever button has focus; it works the replay and the rides only from the page itself.
 {
