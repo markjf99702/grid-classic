@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { DATA } from '../js/data.js';
+import { DATA, COPY } from '../js/data.js';
 import { BOTS } from '../js/bots.js';
 
 const require = createRequire(import.meta.url);
@@ -67,6 +67,24 @@ test('the bracket and the challenge follow from their games', () => {
   }
   assert.equal(DATA.bracket.at(-1).ties[0].winner, DATA.champion);
   assert.equal(DATA.challenge.b, DATA.champion);
+});
+
+test('records in the written copy read win-draw-loss, like the table and the rider cards', () => {
+  const wdl = r => `${r.W}-${r.D}-${r.L}`, row = Object.fromEntries(DATA.standings.map(r => [r.slug, r]));
+  const ko = { W: 0, D: 0, L: 0 };
+  for (const gi of DATA.bracket.flatMap(r => r.ties.flatMap(t => t.games))) {
+    const g = DATA.games[gi];
+    if (g.p.includes('the-professor')) ko[g.winner === 'the-professor' ? 'W' : g.winner ? 'L' : 'D']++;
+  }
+  const copy = [COPY.dek, ...COPY.story, ...COPY.ticker].join('\n');
+  for (const [claim, record] of [
+    ['The Professor, No. 4 seed, % in the knockout', ko],
+    ['DEEP CYCLE: % in the round robin', row['deep-cycle']],
+    ['DEEP CYCLE: % at Crossroads', row['deep-cycle'].byMap.Crossroads],
+    ['Random Randy: %', row['random-randy']],
+    ['The Professor had gone % against Deep Cycle', DATA.h2h['the-professor']['deep-cycle']],
+    ['The Guillotine had a % round-robin record against The Architect', DATA.h2h['the-guillotine']['the-architect']],
+  ]) assert.ok(copy.includes(claim.replace('%', wdl(record))), claim.replace('%', wdl(record)));
 });
 
 test('every bot in the bundle loads and makes a legal first move', () => {
