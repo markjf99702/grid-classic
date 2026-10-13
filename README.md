@@ -5,7 +5,7 @@
 **Sixteen light-cycle bots played a tournament, and this is the broadcast.** Each bot is a small JavaScript program with its own way of playing: hug the walls, chase, cut the other rider off, or search moves ahead. They played a 960-game round robin and a first-to-three knockout, then a seventeenth bot challenged the champion. You can watch any of the 1,023 games with commentary, ride against any bot yourself, or set two of them loose in a game nobody has seen before.
 
 <p align="center">
-  <img src="docs/phone-replay.png" alt="The deciding game of the final on the big screen: The Guillotine's lime trail and The Professor's purple one on a dark grid, the series at 2-2, a territory chart, and the commentators saying The Professor has 119 more cells to live in" width="250">
+  <img src="docs/phone-replay.png" alt="The deciding game of the final on the big screen: The Guillotine's lime trail and The Professor's purple one on a dark grid, the series at 2-2, a territory chart, and the commentators saying the whole middle of the arena is fenced off and nobody can get in" width="250">
   &nbsp;
   <img src="docs/phone-ride.png" alt="A ride against The Professor on the open grid: your white trail and its purple one, with the opponent, arena and speed menus and the Left and Right turn buttons below" width="250">
   &nbsp;
