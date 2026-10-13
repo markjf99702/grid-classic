@@ -69,7 +69,9 @@ function playGame(botFactories, mapName, seed) {
   const start = pos.map(p => ({ ...p }));
   pos.forEach((p, i) => { grid[p.y * W + p.x] = i + 1; });
   const rngs = [mulberry32(seed * 2 + 1), mulberry32(seed * 2 + 2)];
-  const bots = botFactories.map((f, i) => f({ W, H, me: i, rng: rngs[i] }));
+  // untimed: a bot that stops thinking when its time runs out (Deep Cycle) thinks to its full budget here instead,
+  // so a game comes out the same on any machine. The page's rides and dream matches keep the time limit.
+  const bots = botFactories.map((f, i) => f({ W, H, me: i, rng: rngs[i], untimed: true }));
   const moves = [];
   const timeUsed = [0, 0];
   for (let tick = 0; tick < W * H; tick++) {

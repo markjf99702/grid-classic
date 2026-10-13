@@ -11,7 +11,7 @@ const BUDGET = 100; // leaf evaluations per move (deterministic)
 function makeSearcher(g, grid, opts) {
   const NB = g.NB;
   let evals = 0, budget = 0, aborted = false, t0 = 0;
-  const hardMs = opts.hardMs || 18; // safety net only
+  const hardMs = opts.hardMs || 18; // a safety net for the page, so a ride never stalls; the tournament turns it off
 
   function evaluate(a, b) {
     evals++;
@@ -106,12 +106,14 @@ module.exports = {
   color: '#00f5d4',
   style: 'Alpha-Beta Search',
   bio: 'The cold-blooded favourite: iterative-deepening alpha-beta, Voronoi territory and an articulation-point map of every room it enters. Speaks only in principal variations.',
-  factory: () => ({
+  // The tournament engine passes ctx.untimed, and there the search always runs to its full budget, so a game comes out
+  // the same on any machine. On the page it also stops after 18 ms.
+  factory: (ctx = {}) => ({
     move(s) {
       const g = C.geo(s.W, s.H), grid = s.grid;
       const me = C.cellOf(s, s.me), opp = C.cellOf(s, s.opp);
       if (C.separated(g, grid, me, opp)) return C.fillerMove(g, grid, me, s.me.dir, { leafBudget: 50, maxDepth: 30 });
-      return makeSearcher(g, grid, { chamber: CHAMBER }).root(me, opp, s.me.dir, BUDGET, 12);
+      return makeSearcher(g, grid, { chamber: CHAMBER, hardMs: ctx.untimed ? Infinity : 18 }).root(me, opp, s.me.dir, BUDGET, 12);
     },
   }),
 };

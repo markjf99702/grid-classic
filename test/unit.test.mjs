@@ -9,6 +9,22 @@ const require = createRequire(import.meta.url);
 const E = require('../tournament/engine.js');
 const { W, H, DX, DY } = E;
 
+// Loads modules from the page's bundle as the page does, handing them `proc` as their process (the clock Deep Cycle reads).
+function bundle(proc) {
+  const cache = {};
+  const req = (from, name) => {
+    const parts = from.includes('/') ? from.slice(0, from.lastIndexOf('/')).split('/') : [];
+    for (const seg of name.split('/')) { if (seg === '.' || seg === '') continue; if (seg === '..') parts.pop(); else parts.push(seg); }
+    const id = parts.join('/').replace(/\.js$/, '');
+    if (cache[id]) return cache[id].exports;
+    assert.ok(BOTS[id], `missing module ${id}`);
+    const module = { exports: {} }; cache[id] = module;
+    BOTS[id](module, module.exports, n => req(id, n), proc);
+    return module.exports;
+  };
+  return req;
+}
+
 test('every stored game replays to its recorded length and result', () => {
   assert.equal(DATA.games.length, 1023);
   for (const g of DATA.games) {
@@ -114,17 +130,7 @@ test('records in the written copy read win-draw-loss, like the table and the rid
 });
 
 test('every bot in the bundle loads and makes a legal first move', () => {
-  const cache = {};
-  const req = (from, name) => {
-    const parts = from.includes('/') ? from.slice(0, from.lastIndexOf('/')).split('/') : [];
-    for (const seg of name.split('/')) { if (seg === '.' || seg === '') continue; if (seg === '..') parts.pop(); else parts.push(seg); }
-    const id = parts.join('/').replace(/\.js$/, '');
-    if (cache[id]) return cache[id].exports;
-    assert.ok(BOTS[id], `missing module ${id}`);
-    const module = { exports: {} }; cache[id] = module;
-    BOTS[id](module, module.exports, n => req(id, n), process);
-    return module.exports;
-  };
+  const req = bundle(process);
   const engine = req('', 'engine');
   for (const b of DATA.bots) {
     const id = b.slug === DATA.challenge.a ? 'challenger/' + b.slug : 'bots/' + b.slug;
@@ -136,4 +142,22 @@ test('every bot in the bundle loads and makes a legal first move', () => {
     const d = mod.factory({ W, H, me: 0, rng }).move({ grid: grid.slice(), W, H, tick: 0, me, opp, meId: 1, oppId: 2, rng });
     assert.ok([0, 1, 2, 3].includes(d) && d !== (me.dir + 2) % 4, `${b.slug} answered ${d}`);
   }
+});
+
+test('the tournament engine plays Deep Cycle the same however slow the machine is', () => {
+  // A clock that moves 50 ms every time it's read, as on a very slow machine: an 18 ms limit would stop every one of
+  // Deep Cycle's searches at its first check. The tournament engine runs it untimed, so its stored games still replay.
+  const R = require('../tournament/results.json');
+  const slow = () => { let t = 0n; return { hrtime: { bigint: () => (t += 50_000_000n) } }; };
+  const play = (gi, page = false) => {
+    const g = R.games[gi], req = bundle(slow()), factory = s => req('', 'bots/' + s).factory;
+    // The page's rides and dream matches make their bots without the engine's untimed flag.
+    const make = page ? g.p.map(s => ctx => factory(s)({ W: ctx.W, H: ctx.H, me: ctx.me, rng: ctx.rng })) : g.p.map(factory);
+    const r = req('', 'engine').playGame(make, g.map, g.seed);
+    return { moves: r.moves.map(([a, b]) => String.fromCharCode(97 + a * 4 + b)).join(''), winner: g.p[r.winner] };
+  };
+  for (const gi of [599, 965]) assert.equal(play(gi).moves, R.games[gi].moves, `game ${gi} replays move for move`);
+  // On the page the limit still holds: on the same clock Deep Cycle's searches are cut short, and Wallflower wins game 599.
+  assert.equal(R.games[599].winner, 'deep-cycle');
+  assert.equal(play(599, true).winner, 'wallflower');
 });
