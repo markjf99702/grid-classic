@@ -258,6 +258,12 @@ await page.waitForFunction(() => /Dream match 2 is on the big screen/.test(docum
 assert.equal(await page.textContent('#nm1'), 'Barry Straight II');
 const stripLabels = await page.evaluate(() => window.__stripLabels.slice(-2));
 assert.deepEqual(stripLabels, ['TERRITORY · BARRY STRAIGHT II', 'BARRY STRAIGHT I'], 'the territory strip names both sides');
+// The archive keeps the dream matches, and once there is one its stage filter offers them.
+await page.selectOption('#fBot', '');
+await page.selectOption('#fStage', 'Dream match');
+assert.equal(await page.textContent('#fCount'), '2 games');
+assert.equal(await count('#results .gr'), 2, 'both dream matches are listed');
+await page.selectOption('#fStage', '');
 
 // A saved record mangled by hand can't stop the rides, and the other bots' records stay exactly as they were.
 const chickenRecord = '"chicken":{"W":2,"D":0,"L":1}';

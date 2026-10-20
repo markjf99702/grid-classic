@@ -817,6 +817,9 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
           reason = same ? 'head-on' : dead[0] || dead[1] ? 'crash' : 'timeout';
           const g = { i: games.length, stage: 'Dream match', p: [a, b], map, winner, ticks: tick, reason, s: [start[0].x, start[0].y, start[0].dir], moves, gameNo: ++count };
           games.push(g);
+          // The archive keeps dream matches, so from the first one on its stage filter offers them too.
+          if (![...$('fStage').options].some(o => o.value === g.stage)) $('fStage').insertAdjacentHTML('beforeend', opt(g.stage, g.stage));
+          filterGames();
           busy = false; $('dGo').disabled = false;
           if (window.__exActive()) {
             // During a ride it waits on the big screen, paused, rather than pulling the page away from the ride. The big
