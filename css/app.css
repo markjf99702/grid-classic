@@ -71,7 +71,9 @@ button, select { font: inherit; color: inherit; }
 .bug .mid .t { font: 600 20px/1 var(--mono); }
 .bug .mid .m { font: 700 10px/1.2 var(--body); letter-spacing: .12em; text-transform: uppercase; }
 .bug .score { font: 900 26px/1 var(--display); padding: 0 4px; }
-@media (max-width: 600px) { .bug .sub { display: none; } .bug .side { padding: 8px; gap: 6px; } .bug .mid { min-width: 84px; padding: 6px 8px; } }
+/* On a phone a long name takes two lines rather than being cut, at the same size; the spacing is tighter so the longest
+   single words (Wallflower, Bloodhound) still fit beside a series score on a 360 px screen. */
+@media (max-width: 600px) { .bug .sub { display: none; } .bug .side { padding: 8px 4px; gap: 4px; } .bug .nm { white-space: normal; line-height: 1; } .bug .score { padding: 0 2px; } .bug .mid { min-width: 84px; padding: 6px; } .bug .mid .m { letter-spacing: .04em; } }
 .canvaswrap { position: relative; background: #050813; }
 canvas#arena { display: block; width: 100%; height: auto; max-width: 100%; }
 .slowmo { position: absolute; left: 10px; top: 10px; background: var(--live); color: #fff; font: 700 11px/1 var(--body); letter-spacing: .16em; text-transform: uppercase; padding: 5px 8px 4px; border-radius: 2px; }

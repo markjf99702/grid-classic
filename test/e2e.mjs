@@ -168,6 +168,27 @@ await page.locator('.tie').last().click();
 await page.waitForSelector('#series:not([hidden]) .chip');
 await page.locator('#series .chip').first().click();
 assert.match(await page.textContent('#stageName'), /Final · G1/);
+// On a phone the scorebug's names take two lines rather than being cut, beside the series score, down to 360 px:
+// every game of every knockout tie and of the challenge, at its last tick.
+for (const width of [360, 390]) {
+  await page.setViewportSize({ width, height: 844 });
+  const cut = await page.evaluate(() => {
+    const out = new Set();
+    const look = () => {
+      const s = document.getElementById('scrub'); s.value = s.max; s.dispatchEvent(new Event('input'));
+      for (const id of ['nm0', 'nm1']) { const n = document.getElementById(id); if (n.scrollWidth > n.clientWidth) out.add(n.textContent); }
+    };
+    for (const tie of document.querySelectorAll('.tie')) {
+      tie.click();
+      const games = document.querySelectorAll('#series .chip').length; // the chips are drawn again with each game
+      for (let k = 0; k < games; k++) { document.querySelectorAll('#series .chip')[k].click(); look(); }
+    }
+    for (const chip of document.querySelectorAll('#chSeries .chip')) { chip.click(); look(); }
+    return [...out];
+  });
+  assert.deepEqual(cut, [], `names cut short in the scorebug at ${width} px`);
+}
+await page.setViewportSize({ width: 390, height: 844 });
 
 // Every bot runs in the browser and answers with a legal move.
 const bots = await page.evaluate(() => {
