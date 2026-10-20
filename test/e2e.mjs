@@ -87,6 +87,7 @@ assert.ok(targets.chips.length > 6 && targets.chips.every(c => c.h >= 36), 'the 
 
 // The first highlight plays; jumping to the end shows the verdict, its commentary and the next highlight.
 assert.match(await page.textContent('#clipTitle'), /\S/, 'a game is loaded');
+assert.equal(await page.textContent('#play'), 'Pause', 'and plays by itself');
 await page.evaluate(() => { const s = document.getElementById('scrub'); s.value = s.max; s.dispatchEvent(new Event('input')); });
 await page.waitForSelector('#verdict:not([hidden])');
 assert.match(await page.textContent('#verdictText'), /wins|Draw/);
@@ -409,6 +410,11 @@ offline = false;
   desk.on('pageerror', e => problems.push(e.message));
   await desk.goto(base);
   await desk.evaluate(() => document.fonts.ready);
+  // With reduced motion the first replay waits for Play, and the booth's lines don't slide in.
+  assert.equal(await desk.textContent('#play'), 'Play', 'the first replay waits for Play');
+  await desk.waitForTimeout(300);
+  assert.equal(await desk.textContent('#tick'), '000', 'at its start');
+  assert.equal(await desk.$eval('#feed .line', l => getComputedStyle(l).animationName), 'none', 'the commentary doesn\'t slide in');
   const press = async (sel, key = 'Space') => { await desk.focus(sel); await desk.keyboard.press(key); };
   const riding = () => desk.evaluate(() => !!window.__exActive());
   await press('.clip:nth-child(3)');

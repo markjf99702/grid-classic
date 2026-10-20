@@ -846,7 +846,8 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
 
 sizeCanvas();
 const first = reel.length ? reel[0].g : DATA.bracket[DATA.bracket.length - 1].ties[0].games.slice(-1)[0];
-load(first, { from: 'reel' });
+// With reduced motion the first replay waits for Play; a game you pick still plays straight away.
+load(first, { from: 'reel', autoplay: !matchMedia('(prefers-reduced-motion: reduce)').matches });
 requestAnimationFrame(frame);
 // The territory strip's labels are drawn on a canvas, so draw it again once the fonts have arrived.
 if (document.fonts) document.fonts.ready.then(() => { if (cur) { drawMom(); drawMomHead(tick); } });
