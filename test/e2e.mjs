@@ -388,6 +388,27 @@ offline = false;
   await desk.context().close();
 }
 
+// A phone turned sideways shows the whole ride board under the top bar, in the middle, and the page still fits.
+{
+  const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block' })).newPage();
+  phone.on('pageerror', e => problems.push(e.message));
+  await phone.goto(base);
+  await phone.evaluate(() => document.fonts.ready);
+  const board = () => phone.evaluate(() => {
+    const b = document.getElementById('exArena').getBoundingClientRect(), col = document.getElementById('exBoard').getBoundingClientRect();
+    return { width: b.width, height: b.height, column: col.width, left: b.left - col.left, right: col.right - b.right, room: innerHeight - 44, fits: document.documentElement.scrollWidth <= innerWidth };
+  });
+  const upright = await board();
+  assert.ok(Math.abs(upright.width - upright.column) <= 1, 'held upright, the board is as wide as its column');
+  await phone.setViewportSize({ width: 844, height: 390 });
+  await phone.waitForFunction(w => document.getElementById('exArena').getBoundingClientRect().width !== w, upright.width, { timeout: 5000 });
+  const sideways = await board();
+  assert.ok(sideways.height <= sideways.room, `held sideways, the board is ${sideways.height} px tall with ${sideways.room} px under the top bar`);
+  assert.ok(Math.abs(sideways.left - sideways.right) <= 1, 'and in the middle of its column');
+  assert.equal(sideways.fits, true, 'the page scrolls sideways on a phone held sideways');
+  await phone.context().close();
+}
+
 // With JavaScript off, a phone shows what the page needs it for on the first screen, and the page still fits.
 {
   const nojs = await (await browser.newContext({ viewport: { width: 390, height: 844 }, javaScriptEnabled: false, serviceWorkers: 'block' })).newPage();

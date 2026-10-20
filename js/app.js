@@ -603,7 +603,12 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
   };
 
   function size2() {
-    const w = cv2.clientWidth || 800, dpr = Math.min(2, window.devicePixelRatio || 1);
+    // The board is 4:3, and a phone held sideways is shorter than that under the 44 px top bar, so the board takes the
+    // width of its column or of the screen's height, whichever is less, and sits in the middle. The width is set here
+    // from the column, never from the board itself, so it can't feed back into the next measurement.
+    const room = $('exBoard').clientWidth || 800, fit = Math.floor((innerHeight - 44) * W / H);
+    const w = Math.max(160, Math.min(room, fit)), dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv2.style.width = w + 'px';
     cellX = Math.max(4, Math.floor(w * dpr / W));
     cv2.width = cellX * W; cv2.height = cellX * H;
     draw2();
