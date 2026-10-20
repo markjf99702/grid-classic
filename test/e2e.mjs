@@ -470,6 +470,32 @@ offline = false;
   await phone.context().close();
 }
 
+// A dream match that finishes during a ride waits on the big screen, paused, and the ride board stays where it is.
+{
+  const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, reducedMotion: 'reduce', serviceWorkers: 'block' })).newPage();
+  phone.on('pageerror', e => problems.push(e.message));
+  await phone.goto(base);
+  await phone.evaluate(() => document.fonts.ready);
+  await phone.selectOption('#dA', 'spacey');
+  await phone.selectOption('#dB', 'wallflower');
+  const boardTop = () => phone.evaluate(() => document.getElementById('exBoard').getBoundingClientRect().top);
+  await phone.evaluate(() => {
+    document.documentElement.style.overflowAnchor = 'none'; // as in Safari, which doesn't hold the page still by itself
+    window.scrollTo(0, document.getElementById('exBoard').getBoundingClientRect().top + scrollY - 44);
+    document.getElementById('exGo').click();
+    window.__ride().t0 = Infinity; // the countdown holds, so the ride is still on when the match ends
+    document.getElementById('dGo').click();
+  });
+  const top = await boardTop();
+  await phone.waitForFunction(() => /^Dream match 1 is/.test(document.getElementById('dStatus').textContent), null, { timeout: 30000 });
+  assert.equal(await phone.textContent('#dStatus'), 'Dream match 1 is ready on the big screen.');
+  assert.match(await phone.textContent('#stageName'), /Dream match/, 'the match is on the big screen');
+  assert.equal(await phone.textContent('#play'), 'Play', 'paused');
+  assert.ok(Math.abs(await boardTop() - top) < 1, 'and the ride board stays where it was on screen');
+  assert.equal(await phone.evaluate(() => window.__exActive()), true, 'with the ride still on');
+  await phone.context().close();
+}
+
 // With JavaScript off, a phone shows what the page needs it for on the first screen, and the page still fits.
 {
   const nojs = await (await browser.newContext({ viewport: { width: 390, height: 844 }, javaScriptEnabled: false, serviceWorkers: 'block' })).newPage();

@@ -818,8 +818,18 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
           const g = { i: games.length, stage: 'Dream match', p: [a, b], map, winner, ticks: tick, reason, s: [start[0].x, start[0].y, start[0].dir], moves, gameNo: ++count };
           games.push(g);
           busy = false; $('dGo').disabled = false;
-          $('dStatus').textContent = `Dream match ${count} is on the big screen.`;
-          load(g.i, { scroll: true });
+          if (window.__exActive()) {
+            // During a ride it waits on the big screen, paused, rather than pulling the page away from the ride. The big
+            // screen above can change height as it loads, so the ride board is put back where it was on screen (Chrome
+            // would do that itself; Safari wouldn't).
+            const board = $('exBoard'), top = board.getBoundingClientRect().top;
+            load(g.i, { autoplay: false });
+            window.scrollBy(0, board.getBoundingClientRect().top - top);
+            $('dStatus').textContent = `Dream match ${count} is ready on the big screen.`;
+          } else {
+            $('dStatus').textContent = `Dream match ${count} is on the big screen.`;
+            load(g.i, { scroll: true });
+          }
           return;
         }
       }
