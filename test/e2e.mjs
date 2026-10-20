@@ -36,6 +36,18 @@ page.on('request', r => { if (!r.url().startsWith(base)) problems.push('left the
 await page.goto(base);
 await page.evaluate(() => document.fonts.ready);
 const count = sel => page.locator(sel).count();
+// Starts a ride and steers for the nearest wall, so the bot wins; returns what the board says then.
+const loseARide = async p => {
+  await p.click('#exGo');
+  const d = await p.evaluate(() => {
+    const { x, y, dir } = window.__ride().pos[0], room = [y, 39 - x, 29 - y, x];
+    return [0, 1, 2, 3].filter(k => k !== (dir + 2) % 4).sort((a, b) => room[a] - room[b])[0];
+  });
+  await p.keyboard.press(['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'][d]);
+  await p.waitForFunction(() => window.__ride().state === 'over', null, { timeout: 30000 });
+  const sub = await p.textContent('#exMsg small');
+  return { title: (await p.textContent('#exMsg')).slice(0, -sub.length), sub };
+};
 
 // The broadcast is all there: the reel, the bracket, the table, the matrix, the riders and the awards.
 assert.equal(await count('.clip'), 11, 'highlight reel');
@@ -257,6 +269,7 @@ await page.evaluate(() => document.fonts.ready);
 // Swipes on the board steer only during a ride; the rest of the time it scrolls the page like everything else.
 const touchAction = () => page.$eval('#exBoard', b => getComputedStyle(b).touchAction);
 assert.equal(await touchAction(), 'auto', 'the board scrolls the page before a ride');
+assert.equal(await page.textContent('#exMsg small'), 'Swipe or use the turn buttons', 'a touch screen is told to swipe, not to use keys');
 await page.selectOption('#exBot', 'barry-straight');
 await page.selectOption('#exSpeed', '13');
 await page.click('#exGo');
@@ -316,6 +329,10 @@ const yourTrail = async slug => {
 const [againstChicken, againstProfessor] = [await yourTrail('chicken'), await yourTrail('the-professor')];
 assert.ok(againstChicken[2] < 120 && againstChicken[1] < 200, `your trail is gold against Chicken: ${againstChicken}`);
 assert.ok(againstProfessor.every(v => v > 200), `your trail is white against The Professor: ${againstProfessor}`);
+// Lose a ride on a touch screen and the board says to tap Start, not to press Space.
+const lostOnPhone = await loseARide(page);
+assert.equal(lostOnPhone.title, 'The Professor wins');
+assert.match(lostOnPhone.sub, /^You lasted \d+ ticks\. Tap Start to go again\.$/);
 
 // Fits a phone: nothing scrolls sideways.
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'the page scrolls sideways on a phone');
@@ -395,6 +412,12 @@ offline = false;
   assert.equal(await riding(), true, 'the ride carries on');
   await desk.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
   assert.match(await desk.textContent('#exRec'), /^Your record against The Professor: /);
+  // With a mouse and keyboard, the board talks about the keys: before a ride, and after one you lose.
+  await desk.selectOption('#exBot', 'the-professor');
+  assert.equal(await desk.textContent('#exMsg small'), 'Arrow keys or WASD to steer');
+  const lostOnDesk = await loseARide(desk);
+  assert.equal(lostOnDesk.title, 'The Professor wins');
+  assert.match(lostOnDesk.sub, /^You lasted \d+ ticks\. Space or Start to go again\.$/);
   await desk.context().close();
 }
 

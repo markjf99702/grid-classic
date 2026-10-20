@@ -602,6 +602,11 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     return Math.min(r.bottom, innerHeight) - Math.max(r.top, 0) >= r.height / 2;
   };
 
+  // Touch screens, the ones that show the turn buttons, are told to swipe and tap; the rest, to use the keys.
+  const touchFirst = () => matchMedia('(hover: none)').matches;
+  const ready = () => `Ready when you are<small>${touchFirst() ? 'Swipe or use the turn buttons' : 'Arrow keys or WASD to steer'}</small>`;
+  $('exMsg').innerHTML = ready();
+
   function size2() {
     // The board is 4:3, and a phone held sideways is shorter than that under the 44 px top bar, so the board takes the
     // width of its column or of the screen's height, whichever is less, and sits in the middle. The width is set here
@@ -668,7 +673,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
       let title, sub;
       if (dead[0] && dead[1]) { tally(ex.slug, 'D'); title = 'Draw'; sub = `You and ${name} went down together after ${ex.tick} ticks.`; }
       else if (dead[1]) { tally(ex.slug, 'W'); title = 'You win!'; sub = `${name} crashed first, at tick ${ex.tick}.`; }
-      else { tally(ex.slug, 'L'); title = `${name} wins`; sub = `You lasted ${ex.tick} ticks. Space or Start to go again.`; }
+      else { tally(ex.slug, 'L'); title = `${name} wins`; sub = `You lasted ${ex.tick} ticks. ${touchFirst() ? 'Tap Start' : 'Space or Start'} to go again.`; }
       $('exMsg').innerHTML = `${esc(title)}<small>${esc(sub)}</small>`;
       $('exMsg').hidden = false;
     }
@@ -746,11 +751,10 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
   $('exRight').onclick = () => turn(1);
   $('exGo').onclick = start;
   // A new arena or opponent between rides clears the last result away, back to how the board starts.
-  const ready = $('exMsg').innerHTML;
   function clearBoard() {
     if (ex && ex.state !== 'over') return; // mid-ride, the ride carries on
     ex = null; draw2();
-    $('exMsg').innerHTML = ready; $('exMsg').hidden = false;
+    $('exMsg').innerHTML = ready(); $('exMsg').hidden = false;
     $('exGo').textContent = 'Start';
   }
   $('exBot').addEventListener('change', () => { clearBoard(); showRecord(); });
