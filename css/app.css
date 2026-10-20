@@ -99,6 +99,8 @@ input[type=range] { flex: 1; min-width: 120px; accent-color: var(--chyron); }
 .series .chip { background: var(--ink); border: 1px solid var(--line); border-radius: 3px; padding: 4px 8px; font: 600 12px var(--mono); cursor: pointer; }
 .series .chip.on { border-color: var(--chyron); color: var(--chyron); }
 .series .chip .dot { width: 7px; height: 7px; margin-right: 4px; }
+/* Bigger to tap on a phone: the replay's buttons, and the chips for the games of a series. */
+@media (max-width: 600px) { .controls .btn { min-height: 40px; } .controls [data-speed] { min-width: 44px; } .series .chip { min-height: 36px; } }
 .line { padding: 8px 14px; display: grid; grid-template-columns: 44px 1fr; gap: 8px; font-size: 14px; animation: drop .25s ease-out; }
 .line .tk { font: 400 11px/1.8 var(--mono); color: var(--mute); }
 .line .who { font: 700 11px/1 var(--body); letter-spacing: .12em; display: block; margin-bottom: 3px; }

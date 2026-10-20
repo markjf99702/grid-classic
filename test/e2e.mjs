@@ -76,6 +76,14 @@ const matrix = await page.evaluate(() => {
 });
 assert.deepEqual(matrix.touching, [], 'numbers touching the edges of their cells');
 assert.ok(matrix.spread < 0.5, `some numbers widen their cells (by up to ${matrix.spread} px)`);
+// On a phone the replay's buttons are 40 px tall, the speed buttons 44 px wide, and the series chips 36 px tall.
+const targets = await page.evaluate(() => {
+  const size = sel => [...document.querySelectorAll(sel)].map(e => { const r = e.getBoundingClientRect(); return { w: r.width, h: r.height }; });
+  return { controls: size('.controls button'), speeds: size('.controls [data-speed]'), chips: size('#series .chip, #chSeries .chip') };
+});
+assert.ok(targets.controls.length === 6 && targets.controls.every(b => b.h >= 40), 'the replay buttons are 40 px tall');
+assert.ok(targets.speeds.length === 4 && targets.speeds.every(b => b.w >= 44), 'the speed buttons are 44 px wide');
+assert.ok(targets.chips.length > 6 && targets.chips.every(c => c.h >= 36), 'the series chips are 36 px tall');
 
 // The first highlight plays; jumping to the end shows the verdict, its commentary and the next highlight.
 assert.match(await page.textContent('#clipTitle'), /\S/, 'a game is loaded');
