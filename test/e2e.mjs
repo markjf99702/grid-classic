@@ -59,6 +59,8 @@ assert.equal(await count('.award'), 8, 'awards');
 assert.equal(await page.locator('#challengeSection').isHidden(), false, 'the postscript challenge shows');
 assert.match(await page.textContent('#champ'), /The Professor/, 'champion banner');
 assert.equal(await page.evaluate(() => !!document.querySelector('#bracket svg.wires path.hot')?.getAttribute('d')), true, 'the champion\'s path is drawn through the bracket');
+// The ticker's tape runs twice over so it can loop, but a screen reader reads it once.
+assert.equal(((await page.locator('.ticker').ariaSnapshot()).match(/POSTSCRIPT/g) || []).length, 1, 'the ticker is read once');
 // Numbers read the same way throughout: 1,023 like the rest of the page, and each table column to the same places.
 assert.equal(await page.textContent('#fCount'), '1,023 games, showing the longest 300');
 for (const [avg, ms] of await page.$$eval('#table tbody tr', rows => rows.map(r => [r.cells[8].textContent, r.cells[10].textContent]))) {

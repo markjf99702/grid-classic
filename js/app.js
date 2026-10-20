@@ -547,7 +547,8 @@ filterGames();
 const tape = DATA.bracket.flatMap(r => r.ties.map(t => `<span>${esc(r.round.toUpperCase())}: <b>${esc(nameOf(t.winner))}</b> d. ${esc(nameOf(t.winner === t.a ? t.b : t.a))} ${Math.max(...t.score)}-${Math.min(...t.score)}</span>`))
   .concat(DATA.challenge ? [`<span>POSTSCRIPT: <b>${esc(nameOf(DATA.challenge.winner))}</b> wins the challenge match ${Math.max(...DATA.challenge.score)}-${Math.min(...DATA.challenge.score)}</span>`] : [])
   .concat((COPY.ticker || []).map(s => `<span>${esc(s)}</span>`));
-$('tape').innerHTML = tape.join('') + tape.join('');
+// The tape runs twice over so it can loop without a gap; screen readers get it once.
+$('tape').innerHTML = tape.join('') + `<span class="again" aria-hidden="true">${tape.join('')}</span>`;
 
 $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('');
 

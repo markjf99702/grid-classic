@@ -48,6 +48,7 @@ button, select { font: inherit; color: inherit; }
 .ticker { flex: 1; min-width: 0; overflow: hidden; position: relative; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
 .ticker .tape { display: inline-flex; gap: 34px; white-space: nowrap; line-height: 44px; animation: tape 120s linear infinite; font-size: 13px; color: var(--mute); }
 .ticker .tape b { color: var(--fg); font-weight: 600; }
+.ticker .tape .again { display: inline-flex; gap: inherit; } /* the second run, laid out exactly as the first */
 @keyframes tape { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .ticker .tape { animation: none; } }
 
