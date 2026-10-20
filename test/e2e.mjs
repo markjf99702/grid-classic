@@ -442,6 +442,15 @@ offline = false;
   await desk.keyboard.press('Space');
   assert.deepEqual(await onScreen(), [rows[1][1], rows[2][1]].sort(), 'and so does Space');
   assert.equal(await desk.textContent('#play'), 'Pause', 'which plays, not paused by the page\'s own Space');
+  // A click on a cell opens its game and lets go of the cell, so the page's keys work that game: Space pauses it, and
+  // the arrows skip through it rather than taking the page back down to the matrix.
+  await desk.click('.matrix td[data-a] >> nth=20');
+  assert.equal(await desk.evaluate(() => !!document.activeElement.closest('.matrix')), false, 'a click on a cell lets go of it');
+  await desk.keyboard.press('Space');
+  assert.equal(await desk.textContent('#play'), 'Play', 'so Space pauses the game it opened');
+  const pausedAt = +(await desk.textContent('#tick'));
+  await desk.keyboard.press('ArrowRight');
+  assert.equal(+(await desk.textContent('#tick')), pausedAt + 10, 'and the arrows skip through it');
   const press = async (sel, key = 'Space') => { await desk.focus(sel); await desk.keyboard.press(key); };
   const riding = () => desk.evaluate(() => !!window.__exActive());
   await press('.clip:nth-child(3)');

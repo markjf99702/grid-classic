@@ -491,10 +491,13 @@ $('matrix').innerHTML = `<thead><tr><th></th>${order.map(s => `<th class="colh">
     return `<td data-a="${a}" data-b="${b}" style="background:${heat(n ? s / n : .5)}" title="${esc(nameOf(a))} vs ${esc(nameOf(b))}: ${r.W}-${r.D}-${r.L}">${s % 1 ? s.toFixed(1) : s}</td>`;
   }).join('')}</tr>`).join('') + '</tbody>';
 const matrixCells = [...document.querySelectorAll('.matrix td[data-a]')];
-matrixCells.forEach(td => td.onclick = () => {
+matrixCells.forEach(td => td.onclick = e => {
   const a = td.dataset.a, b = td.dataset.b;
   const gs = games.filter(g => g.stage === 'Round robin' && g.p.includes(a) && g.p.includes(b)).sort((x, y) => y.ticks - x.ticks);
   if (gs.length) load(gs[0].i, { scroll: true });
+  // A click or tap lets go of the cell, so Space and the arrows work the game it opened. Opened with Enter or Space, the
+  // cell keeps the focus, so the arrows go on moving through the matrix.
+  if (e.detail) td.blur();
 });
 // The matrix is one tab stop: the arrow keys move between its cells, stepping over each bot's own empty cell, and
 // Enter or Space opens the pair's longest game, as a click does. Those keys stay here rather than working the replay.
