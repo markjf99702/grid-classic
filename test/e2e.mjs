@@ -313,8 +313,11 @@ assert.ok((await page.evaluate(() => localStorage.getItem('grid-classic.record')
 await page.selectOption('#exBot', 'chicken');
 assert.equal(await page.textContent('#exRec'), 'Your record against Chicken: 2 won, 0 drawn, 1 lost');
 
-// You ride the white cycle, and gold against Chicken, who rides white: the help says so and the board draws it so.
-assert.match(await page.textContent('.expanel .help'), /^You ride the white cycle \(gold against Chicken, who rides white\)\./);
+// You ride the white cycle, and gold against Chicken, who rides white: the help names the colour for the bot picked,
+// and the board draws it so.
+const helpFor = async slug => { await page.selectOption('#exBot', slug); return page.textContent('.expanel .help'); };
+assert.match(await helpFor('chicken'), /^You ride the gold cycle\. /);
+assert.match(await helpFor('the-professor'), /^You ride the white cycle\. /);
 const yourTrail = async slug => {
   await page.selectOption('#exBot', slug);
   await page.click('#exGo');

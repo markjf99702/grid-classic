@@ -602,6 +602,10 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     return Math.min(r.bottom, innerHeight) - Math.max(r.top, 0) >= r.height / 2;
   };
 
+  // You ride white, or gold against a bot that rides white itself (Chicken), and the help names the colour.
+  const yours = slug => bot[slug].color.toLowerCase() === '#ffffff' ? '#ffc94d' : '#ffffff';
+  const showColour = () => { $('exYou').textContent = yours($('exBot').value) === '#ffffff' ? 'white' : 'gold'; };
+
   // Touch screens, the ones that show the turn buttons, are told to swipe and tap; the rest, to use the keys.
   const touchFirst = () => matchMedia('(hover: none)').matches;
   const ready = () => `Ready when you are<small>${touchFirst() ? 'Swipe or use the turn buttons' : 'Arrow keys or WASD to steer'}</small>`;
@@ -689,7 +693,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     c2.fillStyle = '#2a355e';
     for (const [x, y] of mapCells(map)) c2.fillRect(x * c + 1, y * c + 1, c - 2, c - 2);
     if (!ex) return;
-    const oc = bot[ex.slug].color, yc = oc.toLowerCase() === '#ffffff' ? '#ffc94d' : '#ffffff';
+    const oc = bot[ex.slug].color, yc = yours(ex.slug);
     [yc, oc].forEach((col, i) => {
       const tr = ex.trails[i], n = ex.dead[i] ? tr.length - 1 : tr.length;
       c2.strokeStyle = rgba(col, .85); c2.lineWidth = Math.max(2, c * .42); c2.lineCap = 'round'; c2.lineJoin = 'round';
@@ -757,8 +761,8 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     $('exMsg').innerHTML = ready(); $('exMsg').hidden = false;
     $('exGo').textContent = 'Start';
   }
-  $('exBot').addEventListener('change', () => { clearBoard(); showRecord(); });
-  showRecord();
+  $('exBot').addEventListener('change', () => { clearBoard(); showRecord(); showColour(); });
+  showRecord(); showColour();
   $('exMap').onchange = clearBoard;
   window.addEventListener('resize', size2);
   size2();
