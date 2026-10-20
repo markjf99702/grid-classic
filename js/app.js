@@ -609,6 +609,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     const room = $('exBoard').clientWidth || 800, fit = Math.floor((innerHeight - 44) * W / H);
     const w = Math.max(160, Math.min(room, fit)), dpr = Math.min(2, window.devicePixelRatio || 1);
     cv2.style.width = w + 'px';
+    $('exBoard').style.setProperty('--cell', w / W + 'px'); // the countdown tab is sized in cells
     cellX = Math.max(4, Math.floor(w * dpr / W));
     cv2.width = cellX * W; cv2.height = cellX * H;
     draw2();
@@ -628,6 +629,7 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     let ai;
     try { ai = req('', modId(slug)).factory({ W, H, me: 1, rng }); } catch (e) { $('exMsg').innerHTML = 'That bot failed to load'; return; }
     ex = { slug, map, grid, pos, ai, rng, tick: 0, queue: [], state: 'countdown', t0: performance.now(), trails: [[{ ...pos[0] }], [{ ...pos[1] }]], dead: [false, false], rate: +$('exSpeed').value };
+    $('exMsg').hidden = true; // the last result goes; the countdown has its own tab
     if (typeof playing !== 'undefined') { playing = false; $('play').textContent = 'Play'; }
     showRecord(slug);
     $('exGo').textContent = 'Restart';
@@ -711,9 +713,9 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
     requestAnimationFrame(loop); // first, so one bad frame can't stop the board for good
     const dt = Math.min(100, now - (last2 || now)); last2 = now;
     if (ex && ex.state === 'countdown') {
-      const left = 3 - Math.floor((now - ex.t0) / 600);
-      if (left <= 0) { ex.state = 'live'; $('exMsg').hidden = true; acc2 = 0; }
-      else { $('exMsg').hidden = false; $('exMsg').innerHTML = `${left}<small>${esc(nameOf(ex.slug))} is waiting</small>`; }
+      const left = 3 - Math.floor(Math.max(0, now - ex.t0) / 600); // a frame stamped just before Start still counts from 3
+      if (left <= 0) { ex.state = 'live'; $('exCount').hidden = true; acc2 = 0; }
+      else { $('exCount').hidden = false; $('exCount').textContent = left; }
     }
     if (ex && ex.state === 'live') {
       acc2 += dt * ex.rate / 1000;

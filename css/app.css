@@ -151,6 +151,9 @@ canvas#exArena { display: block; width: 100%; height: auto; max-width: 100%; mar
 .exover { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
 .exover .msg { background: var(--chyron); color: var(--ink); font: 900 clamp(24px, 5vw, 48px)/1 var(--display); text-transform: uppercase; padding: 10px 20px 8px; box-shadow: 0 10px 40px #0009; text-align: center; }
 .exover .msg small { display: block; font: 600 13px/1.4 var(--body); text-transform: none; margin-top: 6px; }
+/* The countdown is a tab at the board's top edge, two cells tall (the script sets --cell): riders start four or more
+   rows down, so it can't cover either of them or the YOU label above yours. The box in the middle is for results. */
+.exover .count { position: absolute; top: 0; left: 50%; transform: translateX(-50%); min-width: calc(var(--cell, 9px) * 3); height: calc(var(--cell, 9px) * 2); padding: 0 calc(var(--cell, 9px) * .6); display: grid; place-items: center; background: var(--chyron); color: var(--ink); font: 900 calc(var(--cell, 9px) * 1.7)/1 var(--display); border-radius: 0 0 3px 3px; box-shadow: 0 6px 20px #0008; }
 .expanel { border-left: 1px solid var(--line); padding: 16px; display: grid; gap: 12px; align-content: start; }
 @media (max-width: 920px) { .expanel { border-left: 0; border-top: 1px solid var(--line); } }
 .expanel label { display: grid; gap: 4px; font: 700 11px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }

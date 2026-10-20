@@ -260,6 +260,16 @@ assert.equal(await touchAction(), 'auto', 'the board scrolls the page before a r
 await page.selectOption('#exBot', 'barry-straight');
 await page.selectOption('#exSpeed', '13');
 await page.click('#exGo');
+// The countdown is a small tab at the board's top edge, no more than two cells tall, so it can't cover either rider
+// or the YOU label (riders start four or more rows down). The box in the middle is kept for results.
+const countdown = await page.evaluate(() => new Promise(done => requestAnimationFrame(() => {
+  const board = document.getElementById('exArena').getBoundingClientRect(), tab = document.getElementById('exCount'), r = tab?.getBoundingClientRect();
+  done({ state: window.__ride().state, box: !document.getElementById('exMsg').hidden, tab: tab && !tab.hidden && tab.textContent, top: r && r.top - board.top, rows: r && (r.bottom - board.top) / (board.width / 40) });
+})));
+assert.equal(countdown.state, 'countdown');
+assert.equal(countdown.box, false, 'no box in the middle of the board during the countdown');
+assert.match(String(countdown.tab), /^[123]$/, 'the countdown shows in its tab');
+assert.ok(countdown.top >= -0.5 && countdown.rows <= 2, `the countdown tab reaches ${countdown.rows} rows down the board`);
 await page.waitForFunction(() => window.__exActive(), null, { timeout: 5000 });
 assert.equal(await touchAction(), 'none', 'swipes on the board steer during a ride');
 await page.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });
