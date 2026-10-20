@@ -423,6 +423,25 @@ offline = false;
   await desk.waitForTimeout(300);
   assert.equal(await desk.textContent('#tick'), '000', 'at its start');
   assert.equal(await desk.$eval('#feed .line', l => getComputedStyle(l).animationName), 'none', 'the commentary doesn\'t slide in');
+  // The head-to-head matrix is one tab stop. The arrows move between its cells, over each bot's own empty cell, without
+  // working the replay, and Enter or Space opens the pair's longest game, as a click does.
+  const rows = await desk.$$eval('.matrix tbody tr', trs => trs.map(tr => [tr.querySelector('td[data-a]').dataset.a, tr.querySelector('th').textContent]));
+  const stops = () => desk.$$eval('.matrix td[data-a]', tds => tds.filter(td => td.tabIndex === 0).length);
+  const focused = () => desk.evaluate(() => { const td = document.activeElement; return td.dataset.a ? `${td.dataset.a} v ${td.dataset.b}` : td.tagName; });
+  const onScreen = async () => [await desk.textContent('#nm0'), await desk.textContent('#nm1')].sort();
+  assert.equal(await stops(), 1, 'the matrix is one tab stop');
+  await desk.focus('.matrix td[tabindex="0"]');
+  assert.equal(await focused(), `${rows[0][0]} v ${rows[1][0]}`);
+  for (const key of ['ArrowRight', 'ArrowDown', 'ArrowLeft']) await desk.keyboard.press(key);
+  assert.equal(await focused(), `${rows[1][0]} v ${rows[0][0]}`, 'the arrows move between the cells, over the empty diagonal');
+  assert.equal(await desk.textContent('#tick'), '000', 'and leave the replay alone');
+  assert.equal(await stops(), 1, 'still one tab stop');
+  await desk.keyboard.press('Enter');
+  assert.deepEqual(await onScreen(), [rows[0][1], rows[1][1]].sort(), 'Enter opens their game');
+  await desk.keyboard.press('ArrowRight');
+  await desk.keyboard.press('Space');
+  assert.deepEqual(await onScreen(), [rows[1][1], rows[2][1]].sort(), 'and so does Space');
+  assert.equal(await desk.textContent('#play'), 'Pause', 'which plays, not paused by the page\'s own Space');
   const press = async (sel, key = 'Space') => { await desk.focus(sel); await desk.keyboard.press(key); };
   const riding = () => desk.evaluate(() => !!window.__exActive());
   await press('.clip:nth-child(3)');

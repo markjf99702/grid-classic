@@ -490,10 +490,25 @@ $('matrix').innerHTML = `<thead><tr><th></th>${order.map(s => `<th class="colh">
     const r = DATA.h2h[a][b], n = r.W + r.D + r.L, s = r.W + r.D / 2;
     return `<td data-a="${a}" data-b="${b}" style="background:${heat(n ? s / n : .5)}" title="${esc(nameOf(a))} vs ${esc(nameOf(b))}: ${r.W}-${r.D}-${r.L}">${s % 1 ? s.toFixed(1) : s}</td>`;
   }).join('')}</tr>`).join('') + '</tbody>';
-document.querySelectorAll('.matrix td[data-a]').forEach(td => td.onclick = () => {
+const matrixCells = [...document.querySelectorAll('.matrix td[data-a]')];
+matrixCells.forEach(td => td.onclick = () => {
   const a = td.dataset.a, b = td.dataset.b;
   const gs = games.filter(g => g.stage === 'Round robin' && g.p.includes(a) && g.p.includes(b)).sort((x, y) => y.ticks - x.ticks);
   if (gs.length) load(gs[0].i, { scroll: true });
+});
+// The matrix is one tab stop: the arrow keys move between its cells, stepping over each bot's own empty cell, and
+// Enter or Space opens the pair's longest game, as a click does. Those keys stay here rather than working the replay.
+matrixCells.forEach((td, k) => { td.tabIndex = k ? -1 : 0; });
+$('matrix').addEventListener('focusin', e => { if (e.target.dataset.a) matrixCells.forEach(td => { td.tabIndex = td === e.target ? 0 : -1; }); });
+$('matrix').addEventListener('keydown', e => {
+  const td = e.target.closest('td[data-a]'), step = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] }[e.key];
+  if (!td || (!step && e.key !== 'Enter' && e.key !== ' ')) return;
+  e.preventDefault(); e.stopPropagation();
+  if (!step) { td.click(); return; }
+  let r = order.indexOf(td.dataset.a), c = order.indexOf(td.dataset.b);
+  do { r += step[0]; c += step[1]; } while (r === c);
+  const next = matrixCells.find(x => x.dataset.a === order[r] && x.dataset.b === order[c]);
+  if (next) next.focus();
 });
 
 // roster
