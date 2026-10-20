@@ -207,10 +207,7 @@ function load(gi, opts = {}) {
   // Knockout games: show the whole series as chips so you can hop between its games.
   const tieOf = allSeries().find(t => t.games.includes(g.i));
   $('series').hidden = !tieOf;
-  if (tieOf) $('series').innerHTML = `<span class="sl">Series</span>` + tieOf.games.map((gi, n) => {
-    const w = games[gi].winner;
-    return `<button class="chip${gi === g.i ? ' on' : ''}" data-g="${gi}" title="Game ${n + 1}: ${esc(games[gi].map)}">${w ? dot(w) : ''}G${n + 1}${w ? '' : ' ½'}</button>`;
-  }).join('');
+  if (tieOf) $('series').innerHTML = `<span class="sl">Series</span>` + tieOf.games.map((gi, n) => seriesChip(gi, n, gi === g.i)).join('');
   $('clipTitle').textContent = h ? h.title : `${sideName(g, 0)} vs ${sideName(g, 1)}`;
   $('clipBlurb').textContent = h ? h.blurb : g.stage === 'Challenge' ? `${g.map}. The champion against the challenger.` : row[g.p[0]] && row[g.p[1]] ? `${g.map}. Seed ${row[g.p[0]].rank} against seed ${row[g.p[1]].rank}.` : g.map + '.';
   $('scrub').max = sim.heads.length - 1; $('scrub').value = 0;
@@ -232,6 +229,11 @@ function nextUp() {
     if (k >= 0 && k + 1 < t.games.length) return { g: t.games[k + 1], label: `Game ${k + 2} of the series →` };
   }
   return null;
+}
+// A chip for one game of a series. Its tooltip and what a screen reader hears say which game, where, and who won.
+function seriesChip(gi, n, on) {
+  const w = games[gi].winner, about = `Game ${n + 1}, ${games[gi].map}: ${w ? `${nameOf(w)} won` : 'a draw'}`;
+  return `<button class="chip${on ? ' on' : ''}" data-g="${gi}" title="${esc(about)}" aria-label="${esc(about)}">${w ? dot(w) : ''}G${n + 1}${w ? '' : ' ½'}</button>`;
 }
 // Knockout ties plus the postscript challenge, all as {a, b, games}.
 function allSeries() { return DATA.bracket.flatMap(r => r.ties).concat(DATA.challenge ? [DATA.challenge] : []); }
@@ -451,7 +453,7 @@ if (DATA.challenge) {
       <span class="cn" style="color:${cb.color}">${esc(cb.name)}</span>
       <span class="tg">“${esc(cb.tagline)}”</span>
       <p>${esc(cb.bio)} After the final, it was written for one job: beat ${esc(nameOf(c.b))}, first to four wins. ${won ? `It did. The champion's reign lasted one series.` : `It couldn't. ${esc(nameOf(c.b))} keeps the belt.`}</p>
-      <div class="series" id="chSeries">${c.games.map((gi, n) => { const w = games[gi].winner; return `<button class="chip" data-g="${gi}" title="Game ${n + 1}: ${esc(games[gi].map)}">${w ? dot(w) : ''}G${n + 1}${w ? '' : ' ½'}</button>`; }).join('')}</div>
+      <div class="series" id="chSeries">${c.games.map((gi, n) => seriesChip(gi, n, false)).join('')}</div>
     </div>
     <div class="sc"><span style="color:${cb.color}">${c.score[0]}</span> – <span style="color:${bot[c.b].color}">${c.score[1]}</span></div>`;
   $('chSeries').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) load(+b.dataset.g, { scroll: true }); });

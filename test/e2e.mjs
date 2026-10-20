@@ -201,6 +201,12 @@ await page.locator('.tie').last().click();
 await page.waitForSelector('#series:not([hidden]) .chip');
 await page.locator('#series .chip').first().click();
 assert.match(await page.textContent('#stageName'), /Final · G1/);
+// Each chip says which game it is, where, and who won it, to a screen reader as in its tooltip.
+const chipLabels = await page.$$eval('#series .chip', cs => cs.map(c => [c.getAttribute('aria-label'), c.title]));
+assert.deepEqual(chipLabels.map(c => c[1]), chipLabels.map(c => c[0]), 'the tooltips say the same');
+assert.match(chipLabels[0][0], /^Game 1, [A-Za-z ]+: a draw$/, 'the final opened with a draw');
+assert.equal(chipLabels[5][0], 'Game 6, Pillars: The Professor won');
+assert.match(await page.getAttribute('#chSeries .chip', 'aria-label'), /^Game 1, [A-Za-z ]+: .+ won$/, 'and so do the postscript\'s chips');
 // On a phone the scorebug's names take two lines rather than being cut, beside the series score, down to 360 px:
 // every game of every knockout tie and of the challenge, at its last tick.
 for (const width of [360, 390]) {
