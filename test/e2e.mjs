@@ -283,6 +283,31 @@ assert.equal(countdown.state, 'countdown');
 assert.equal(countdown.box, false, 'no box in the middle of the board during the countdown');
 assert.match(String(countdown.tab), /^[123]$/, 'the countdown shows in its tab');
 assert.ok(countdown.top >= -0.5 && countdown.rows <= 2, `the countdown tab reaches ${countdown.rows} rows down the board`);
+// A swipe turns as soon as the finger has moved 18 px, before it lifts, and the same drag carrying on turns again from
+// there; lifting the finger then adds nothing. A flick with no move reported still turns when it lifts.
+const swipes = await page.evaluate(() => {
+  const ex = window.__ride(), board = document.getElementById('exBoard'), r = board.getBoundingClientRect();
+  const send = (type, x, y) => {
+    const t = new Touch({ identifier: 1, target: board, clientX: x, clientY: y });
+    board.dispatchEvent(new TouchEvent(type, { touches: type === 'touchend' ? [] : [t], changedTouches: [t], bubbles: true, cancelable: true }));
+  };
+  const DX = [0, 1, 0, -1], DY = [-1, 0, 1, 0], from = ex.queue.length;
+  const a = ((ex.queue.length ? ex.queue[ex.queue.length - 1] : ex.pos[0].dir) + 1) % 4, b = (a + 1) % 4;
+  let x = r.left + r.width / 2, y = r.top + r.height / 2;
+  send('touchstart', x, y);
+  x += DX[a] * 24; y += DY[a] * 24; send('touchmove', x, y);
+  const moved = ex.queue.slice(from);
+  x += DX[b] * 24; y += DY[b] * 24; send('touchmove', x, y);
+  const carriedOn = ex.queue.slice(from);
+  send('touchend', x, y);
+  const lifted = ex.queue.slice(from);
+  send('touchstart', x, y); send('touchend', x + DX[a] * 30, y + DY[a] * 30);
+  return { a, b, moved, carriedOn, lifted, flicked: ex.queue.slice(from) };
+});
+assert.deepEqual(swipes.moved, [swipes.a], 'a swipe turns once the finger has moved 18 px');
+assert.deepEqual(swipes.carriedOn, [swipes.a, swipes.b], 'and the same drag carrying on turns again');
+assert.deepEqual(swipes.lifted, [swipes.a, swipes.b], 'lifting the finger then adds nothing');
+assert.deepEqual(swipes.flicked, [swipes.a, swipes.b, swipes.a], 'a flick turns when it lifts');
 await page.waitForFunction(() => window.__exActive(), null, { timeout: 5000 });
 assert.equal(await touchAction(), 'none', 'swipes on the board steer during a ride');
 await page.waitForFunction(() => !window.__exActive(), null, { timeout: 30000 });

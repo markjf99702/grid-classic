@@ -743,14 +743,22 @@ $('credits').innerHTML = (COPY.footer || []).map(p => `<p>${esc(p)}</p>`).join('
       else if (window.__exReady()) { e.preventDefault(); start(); }
     } else if (e.code in keyDir && window.__exActive()) { e.preventDefault(); steer(keyDir[e.code]); }
   });
+  // A swipe turns as soon as the finger has moved 18 px, not when it lifts, and a drag that carries on can turn again
+  // from there. Lifting the finger still turns for a flick too quick for a move to be reported.
   let touch = null;
-  $('exBoard').addEventListener('touchstart', e => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; }, { passive: true });
-  $('exBoard').addEventListener('touchmove', e => { if (window.__exActive()) e.preventDefault(); }, { passive: false });
-  $('exBoard').addEventListener('touchend', e => {
-    if (!touch) return; const t = e.changedTouches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y; touch = null;
+  const swipe = t => {
+    const dx = t.clientX - touch.x, dy = t.clientY - touch.y;
     if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) return;
     steer(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
-  });
+    touch = { x: t.clientX, y: t.clientY };
+  };
+  $('exBoard').addEventListener('touchstart', e => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; }, { passive: true });
+  $('exBoard').addEventListener('touchmove', e => {
+    if (!window.__exActive()) return;
+    e.preventDefault();
+    if (touch) swipe(e.touches[0]);
+  }, { passive: false });
+  $('exBoard').addEventListener('touchend', e => { if (touch) swipe(e.changedTouches[0]); touch = null; });
   $('exLeft').onclick = () => turn(-1);
   $('exRight').onclick = () => turn(1);
   $('exGo').onclick = start;
