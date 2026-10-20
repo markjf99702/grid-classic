@@ -52,9 +52,9 @@ async function showGame(page, gi, tick) {
 // Scrolls an element to just under the sticky top bar.
 const scrollTo = (page, sel) => page.evaluate(sel => { const el = document.querySelector(sel); window.scrollTo(0, el.getBoundingClientRect().top + scrollY - 44); }, sel);
 
-// The tick just after the final's sealing moment, when the booth calls it.
+// The tick the final is sealed on, from the replay itself, so it doesn't depend on what the booth says then.
 async function sealTick(page) {
-  return page.evaluate(gi => window.__lines(gi).find(l => l.big).tick, FINAL);
+  return page.evaluate(gi => window.__sim(gi).sep.tick, FINAL);
 }
 
 // Rides against a bot on the clock, steering towards the most open space and turning often,

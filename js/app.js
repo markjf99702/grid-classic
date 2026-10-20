@@ -373,6 +373,7 @@ function frame(now) {
 }
 $('series').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) load(+c.dataset.g, { from: cur.from }); });
 window.__lines = gi => commentary(games[gi], simulate(games[gi]));
+window.__sim = gi => simulate(games[gi]); // for tools/screenshots.mjs, which photographs the moment the final is sealed
 $('play').onclick = () => {
   if (tick >= cur.sim.heads.length - 1) { tick = 0; drawUpTo(0); }
   playing = !playing; $('play').textContent = playing ? 'Pause' : 'Play';
