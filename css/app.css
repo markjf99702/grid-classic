@@ -204,6 +204,9 @@ tr.cut td { border-bottom: 2px solid var(--chyron); }
 .matrix th.colh { writing-mode: vertical-rl; transform: rotate(180deg); text-align: left; height: 110px; vertical-align: bottom; }
 .matrix td { width: 34px; height: 30px; padding: 0; text-align: center; border: 0; font-size: 11px; color: var(--ink); font-weight: 600; cursor: pointer; border-radius: 2px; }
 .matrix td.self { background: transparent; cursor: default; }
+/* On a phone the cells stay as narrow as the names over them, with room each side of the number: in the page's
+   figures, 0.5 fits at 10 px where the monospaced face would widen the cell and the matrix would scroll further. */
+@media (max-width: 600px) { .matrix td { font-family: var(--body); font-size: 10px; padding: 0 2px; } }
 .legend { display: flex; gap: 14px; align-items: center; font-size: 12px; color: var(--mute); flex-wrap: wrap; }
 .legend .ramp { width: 140px; height: 8px; border-radius: 1px; }
 

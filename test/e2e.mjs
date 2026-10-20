@@ -66,6 +66,16 @@ for (const [avg, ms] of await page.$$eval('#table tbody tr', rows => rows.map(r 
   assert.match(ms, /^\d+\.\d{3}$/, 'ms per move');
 }
 assert.ok((await page.$$eval('.card .stats span:nth-child(2) b', bs => bs.map(b => b.textContent))).every(t => /^\d+\.\d$/.test(t)), 'average ticks on the rider cards');
+// On a phone the head-to-head numbers keep clear of their cells' edges (0.5 and 7.5 used to touch them), and no
+// number widens its cell, so the matrix scrolls sideways no further than its names make it.
+const matrix = await page.evaluate(() => {
+  const cells = [...document.querySelectorAll('.matrix td[data-a]')], text = document.createRange();
+  const touching = cells.filter(td => { text.selectNodeContents(td); const t = text.getBoundingClientRect(), c = td.getBoundingClientRect(); return t.left - c.left < 1.5 || c.right - t.right < 1.5; });
+  const widths = cells.map(td => td.getBoundingClientRect().width);
+  return { touching: touching.map(td => td.textContent), spread: Math.max(...widths) - Math.min(...widths) };
+});
+assert.deepEqual(matrix.touching, [], 'numbers touching the edges of their cells');
+assert.ok(matrix.spread < 0.5, `some numbers widen their cells (by up to ${matrix.spread} px)`);
 
 // The first highlight plays; jumping to the end shows the verdict, its commentary and the next highlight.
 assert.match(await page.textContent('#clipTitle'), /\S/, 'a game is loaded');
