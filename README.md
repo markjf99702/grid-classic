@@ -67,4 +67,4 @@ A new run plays every game the same way on any machine (only the thinking times 
 - `tournament/results.json`, `tournament/challenge.json`: the recorded games. `tournament/story.json`, `tournament/highlights.json`: the written commentary.
 - `tournament/analyze.js`, `tournament/inspect.js`: replay tools for writing commentary (`node tournament/inspect.js 1016` draws the final's last game in the terminal). `tournament/replay.js` plays every stored game again with the bots as they are now, to show which games a change to a bot's code would alter (`node tournament/replay.js chicken` for just Chicken's).
 - `fonts/`: Big Shoulders Display, Barlow and JetBrains Mono (SIL Open Font License), served from here so nothing loads from elsewhere.
-- `sw.js`: keeps a copy for using offline.
+- `sw.js`: keeps a copy for using offline. On a connection that isn't answering, a page opens from that copy after four seconds. `FILES` in it is a fingerprint of the files it keeps: change one and `npm test` says what to set it to, so a release never leaves the copy half old.
